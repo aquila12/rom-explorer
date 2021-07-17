@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module Layoutable
+  # Implementation of the layout DSL
   class Layout
     def initialize
       @size = 0
       @structure = {}
       @layout = {}
 
-      structure :bytes, String
+      structure :bytes, Bytes, 'a*'
     end
 
     def structure(name, type, *args)
@@ -15,20 +16,21 @@ module Layoutable
     end
 
     def resolve_type(type, *args)
-      type.is_a?(Class) ? [type, *args] : @structure.fetch(type)
+      return @structure.fetch(type) if type.is_a? Symbol
+
+      { class: type, args: args }
     end
 
     def check_offset!(offset)
       return if offset < @size
 
-      raise ArgumentError, format('Offset %x exceeds size %x', offset, @size)
+      raise ArgumentError, format('Offset %<o>x exceeds size %<s>x', o: offset, s: @size)
     end
 
     def at(offset, label, type, *args)
       check_offset! offset
 
-      type, *args = resolve_type(type, *args)
-      @layout[offset] = [ label, { class: type, args: args } ]
+      @layout[offset] = [label, resolve_type(type, *args)]
     end
 
     def size(size)

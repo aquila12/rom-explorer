@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Layoutable
+  # Top-level container for laid-out binaries
   class AppliedLayout < Hash
     def initialize(data, directory)
       super()
@@ -20,7 +21,7 @@ module Layoutable
     end
 
     def load_all
-      @directory.keys.each { |k| self[k] }
+      @directory.each_key { |k| self[k] }
       self
     end
   end

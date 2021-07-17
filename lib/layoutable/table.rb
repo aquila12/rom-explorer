@@ -3,6 +3,7 @@
 require 'stringio'
 
 module Layoutable
+  # Implementation of a table container with fixed-size records
   class Table < Hash
     def initialize(data, stride, *rowinfo)
       super()
@@ -18,12 +19,12 @@ module Layoutable
       @data.byteslice(index * @stride, @stride)
     end
 
-    def format_record(r)
-      @rowclass.new(r, *@rowargs)
+    def format(record)
+      @rowclass.new(record, *@rowargs)
     end
 
     def loader(tbl, index)
-      tbl[index] = format_record(record(index))
+      tbl[index] = format(record(index))
     end
 
     def load_all
@@ -31,9 +32,13 @@ module Layoutable
       loop.each_with_index do |_, index|
         r = io.read(@stride)
         break unless r
-        self[index] = format_record(r)
+
+        self[index] = format(r)
       end
       self
     end
+
+    # Make it iterate like an array
+    alias each each_value
   end
 end

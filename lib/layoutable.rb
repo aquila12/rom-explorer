@@ -4,12 +4,15 @@ require_relative 'layoutable/layout'
 require_relative 'layoutable/applied_layout'
 require_relative 'layoutable/table'
 require_relative 'layoutable/struct'
+require_relative 'layoutable/bytes'
 
+# Wrapper around layout DSL
 module Layoutable
   def self.included(includee)
     includee.extend(ClassMethods)
   end
 
+  # Class methods for layouts
   module ClassMethods
     def define_layout(&block)
       @layout = Layout.new

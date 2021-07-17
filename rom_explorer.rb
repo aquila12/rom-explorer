@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # ROM explorer utility
 
-$LOAD_PATH.unshift(File.dirname(__FILE__) + '/lib')
+$LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 
 require 'layoutable'
 require 'irb'
@@ -15,9 +17,11 @@ def apply(layout)
   @rom = layout.apply_to(@data)
 end
 
-def pwd
+def cwd
   @cwd ||= []
 end
+
+alias pwd cwd
 
 def cd(*args)
   args.each do |d|
@@ -32,10 +36,10 @@ def cd(*args)
 end
 
 def item
-  (!@cwd || @cwd.empty?) ? @rom : @rom.dig(*@cwd)
+  !@cwd || @cwd.empty ? @rom : @rom.dig(*@cwd)
 end
 
-while(arg = ARGV.shift)
+while (arg = ARGV.shift)
   case arg
   when '-r'
     rom ARGV.shift
@@ -50,4 +54,4 @@ while(arg = ARGV.shift)
   end
 end
 
-binding.irb
+binding.irb # rubocop:disable Lint/Debugger

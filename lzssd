@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby2.5
+# Rings of Power LZSS decompressor
+
+DIR = 0xb86ae	# Start address of file table
+FILE = 0xb8a32	# Start address of file
+
+class LZSS
+  def self.decompress(io)
+    new(io).result
+  end
+
+  def initialize(io)
+    @io = io
+    @length = io.read(4).unpack1('V')
+    @window = String.new(" " * 4096)
+    @windex = 0xfee
+    @output = String.new
+    @flag = flag_reader
+    @byte = byte_reader
+  end
+
+  def result
+    decompress unless @done
+
+    @output
+  end
+
+  private
+
+  def decompress
+    @length.times do
+      c = @byte.next
+      @output += c
+      @window[@windex] = c
+      @windex = (@windex + 1) & 0xfff
+    end
+    @done = true
+  end
+
+  def flag_reader
+    Enumerator.new do |y|
+      loop do
+        flags = @io.read(1).unpack1('C')
+        8.times { |b| y << flags[b].nonzero? }
+      end
+    end
+  end
+
+  def byte_reader
+    Enumerator.new do |y|
+      loop do
+        if @flag.next
+          y << @io.read(1)
+        else
+          length, index = read_control_word
+          length.times do |i|
+            y << @window[(index + i) & 0xfff]
+          end
+        end
+      end
+    end
+  end
+
+  def read_control_word
+    ctrlw = @io.read(2).unpack1('v')
+    length = 3 + ctrlw[8..11]
+    index = (ctrlw[12..15] << 8) + ctrlw[0..7]
+    [ length, index ]
+  end
+end
+
+def write_bitmap(filename, width, height, palette, data)
+  File.open(filename, 'wb') do |f|
+    f.write 'BM'
+    sizepos = f.pos
+    f.write [0, 0, 0].pack('Vvv')
+    offspos = f.pos
+    f.write [0, 40, width, -height].pack('V*')
+    f.write [1, 4, 0, 0, 0, 0, 0, 0].pack('vvV*')
+
+    palette.each_with_index do |e, i|
+      f.write(
+        [ e[8..11], e[4..7], e[0..3], e[12.15] ]
+          .map { |ch| ch * 0x12 }
+          .pack('CCCC')
+      )
+    end
+
+    offset = f.pos
+    f.write data
+    size = f.pos
+
+    f.seek(sizepos)
+    f.write [size].pack('V')
+    f.seek(offspos)
+    f.write [offset].pack('V')
+  end
+end
+
+def restripe(data, pw)
+  patternlines = data.unpack('V*')
+  scanlines = patternlines.each_slice(8*pw).map do |block|
+    patterns = block.each_slice(8).to_a
+    patterns.transpose
+  end
+
+  scanlines.flatten.pack('V*')
+end
+
+filename = ARGV.shift
+
+ROM = File.open(filename, 'rb') do |f|
+  case ARGV.shift
+  when '-t'
+    filenum = ARGV.shift.to_i
+
+    f.seek(DIR + 10 * filenum)
+    warn "Entry %d at 0x%05x" % [filenum, f.pos]
+    if f.pos >= FILE  
+      warn "Seeked past end of table"
+      exit 1
+    end
+
+    offset, _unknown, type = f.read(10).unpack('NNn')
+    warn "Type #{type} isn't recognised, this could go un-well!" unless type == 1
+
+    f.seek(FILE + offset)
+  when '-a'
+    f.seek(ARGV.shift.to_i(16))
+  end
+
+  warn "File at 0x%05x" % f.pos
+  payload = LZSS.decompress(f)
+  warn "Finished at 0x%05x" % f.pos
+
+  case ARGV.shift
+  when '-t'
+    puts payload
+  when '-g'
+    *palette, data = payload.unpack('n16a*')  
+    write_bitmap("graphic-#{filenum}.bmp", 48, 48, palette, restripe(data, 6))
+
+    histogram = data.unpack1('H*').chars.group_by(&:itself).transform_values(&:length)
+    histogram.sort.each do |k,v|
+      i = k.to_i(16)
+      warn "%2d (0x%04x): %d entries" % [i, palette[i], v]
+    end
+
+    warn "#{histogram.count} used colours"
+    warn "#{histogram.values.sum} pixels"
+  end
+end

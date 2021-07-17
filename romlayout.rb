@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-class ROM
+# Rings of Power ROM layout
+class RingsOfPower
   include Layoutable
 
-  define_layout do
+  define_layout do # rubocop:disable Metrics/BlockLength
     size 0x100000
 
     code = ['code_%05x', :m68k]
@@ -64,18 +65,31 @@ class ROM
 
     at 0xb86ae, :portrait_directory, :directory
     at 0xb8a32, :portrait_files, :lzss_files
-  # Is this length correct?
+    # Is this gap correct?
     at 0xccdb8, :menu_definitions, :bytes # Variable length structure
-    at 0xcd430, :people_items, Table, 16, 'cZ*', :flags, :name
+    at 0xcd430, :people_items, Table, 16, 'CZ*', :flags, :name
     at 0xcecf0, *data
 
     at 0xcf1b0, *table, 24, 'a*'
-    at 0xd1cfc, :locations_table, Table, 10, 'ccccnncc', :unk1, :unk2, :unk3, :unk4, :lat, :long, :floor, :type
+    at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :unk1, :unk2, :unk3, :unk4, :long, :lat, :floor, :type
     at 0xd2ec2, *table, 12, 'a*'
     at 0xd601e, *table, 6, 'a*'
     at 0xd66a2, *table, 10, 'a*'
     at 0xd676a, *table, 4, 'a*'
     at 0xd6b6a, *data
+    at 0xd6b6a, *data # Zeros
+
+    at 0xd6eba, :dictionary, Bytes, String
+    at 0xdc0c0, *data
+    at 0xdc0c2, :dictionary_index, Table, 2, Struct, 'n'
+
+    at 0xddbd8, :paragraph_directory, :directory
+    at 0xe0a18, :paragraph_wordlists, Bytes, Struct, 'n*'
+
+    at 0xeb770, *data
+    at 0xed0e8, *data
+
+    at 0xfd07c, :ea_checksum, :m68k
 
     at 0xd676a, :unknown_table, Table, 4, Struct, 'nn', :lat, :long
   end
