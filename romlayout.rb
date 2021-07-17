@@ -34,13 +34,13 @@ class ROM
 
     at 0x197b0, *data
 
-    at 0x1a710, :text_class_full, Table, 12, 'a*'
-    at 0x1a794, :text_class_abbr, Table, 4, 'a*'
-    at 0x1a7c0, :text_status_filler, Table, 6, 'a*'
-    at 0x1a7f0, :text_status_health, Table, 16, 'a*'
-    at 0x1a8c0, :text_status_mana, Table, 16, 'a*'
-    at 0x1a990, :text_status_mood, Table, 16, 'a*'
-    at 0x1aa60, :text_status_level, Table, 90, Table, 10, 'a*'
+    at 0x1a710, :text_class_full, Table, 12, 'Z*'
+    at 0x1a794, :text_class_abbr, Table, 4, 'Z*'
+    at 0x1a7c0, :text_status_filler, Table, 6, 'Z*'
+    at 0x1a7f0, :text_status_health, Table, 16, 'Z*'
+    at 0x1a8c0, :text_status_mana, Table, 16, 'Z*'
+    at 0x1a990, :text_status_mood, Table, 16, 'Z*'
+    at 0x1aa60, :text_status_level, Table, 90, Table, 10, 'Z*'
     at 0x1ade4, *data
     at 0x1b320, :text_title_scroller, Table, 42, 'a*'
     at 0x1b446, *data
@@ -66,7 +66,7 @@ class ROM
     at 0xb8a32, :portrait_files, :lzss_files
   # Is this length correct?
     at 0xccdb8, :menu_definitions, :bytes # Variable length structure
-    at 0xcd430, :people_items, Table, 16, 'ca*', :flags, :name
+    at 0xcd430, :people_items, Table, 16, 'cZ*', :flags, :name
     at 0xcecf0, *data
 
     at 0xcf1b0, *table, 24, 'a*'

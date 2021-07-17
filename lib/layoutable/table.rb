@@ -26,7 +26,10 @@ module Layoutable
     end
 
     def each
-      StringIO.new(@data, 'rb').each_entry(@stride) do |r|
+      io = StringIO.new(@data, 'rb')
+      loop do
+        r = io.read(@stride)
+        break unless r
         yield format_record(r)
       end
     end
