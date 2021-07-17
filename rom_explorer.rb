@@ -7,7 +7,12 @@ require 'layoutable'
 require 'irb'
 
 def rom(filename)
-  @data = File.binread(ARGV.shift)
+  @data = File.binread(filename)
+  @data.length
+end
+
+def apply(layout)
+  @rom = layout.apply_to(@data)
 end
 
 binding.irb

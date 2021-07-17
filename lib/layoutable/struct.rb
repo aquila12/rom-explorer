@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module Layoutable
-  module Struct
-    module_function
-
-    def new(data, format, *labels)
+  class Struct
+    def self.new(data, format, *labels)
       fields = data.unpack(format)
       return Hash[labels.zip(fields)] unless labels.empty?
 

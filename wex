@@ -2,8 +2,10 @@
 # Rings of Power word extractor
 
 CHARS = 0xd6eba..0xdc0bf  # ROM Address where character data lives
-OFFSETS = 0xdc0c2..0xddbd8 # ROM Address where word offset data lives
+OFFSETS = 0xdc0c2..0xddbd7 # ROM Address where word offset data lives
 TABLE = 0xddbd8	# ROM Address where string table data lives
+TEXT_COUNT = 1184
+
 STRINGS = 0xe0a18 # ROM Address where words data lives
 PUNC_LUT = {
   0x0000 => ' ',
@@ -29,7 +31,7 @@ def lookup(index_array)
     word_number = i & 0x3fff
     punc = PUNC_LUT[i & 0xc000]
     word = WORDS[word_number - 1]
-    ['\0', punc].include?(word) ? word : word + punc
+    ['\0', punc].include?(word) ? word : "#{word}#{punc}"
   end.join
 end
 
@@ -62,10 +64,8 @@ when '-a'
 when '-t'
   puts lookup_indirect(*table(ARGV.shift.to_i))
 when '--dump'
-  (0..Float::INFINITY).each do |n|
+  TEXT_COUNT.times do |n|
     start, count = table(n)
-    break if count < 1
-    break if count > 50
     puts "#{n}\t#{lookup_indirect(start, count)}"
   end  
 end

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-module ROM < Layoutable::Layout
-  def layout
+class ROM
+  include Layoutable
+
+  define_layout do
     size 0x100000
 
     code = ['code_%05x', :m68k]
