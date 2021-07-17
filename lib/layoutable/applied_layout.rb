@@ -5,7 +5,8 @@ module Layoutable
     def initialize(data, directory)
       super()
       self.default_proc = method(:loader)
-      @target = data
+
+      @data = data
       @directory = directory
     end
 
@@ -14,7 +15,7 @@ module Layoutable
     def loader(dir, label)
       entry = @directory.fetch(label)
       range = entry[:range]
-      data = @target[range]
+      data = @data[range]
       dir[label] = entry[:class].new(data, *entry[:args])
     end
 

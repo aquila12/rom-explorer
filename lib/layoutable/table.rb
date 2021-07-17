@@ -3,10 +3,11 @@
 require 'stringio'
 
 module Layoutable
-  class Table
-    include Enumerable
-
+  class Table < Hash
     def initialize(data, stride, *rowinfo)
+      super()
+      self.default_proc = method(:loader)
+
       @data = data
       @stride = stride
       @rowclass = rowinfo.first.is_a?(Class) ? @rowclass = rowinfo.shift : Struct
@@ -21,17 +22,18 @@ module Layoutable
       @rowclass.new(r, *@rowargs)
     end
 
-    def [](index)
-      format_record(record(index))
+    def loader(tbl, index)
+      tbl[index] = format_record(record(index))
     end
 
-    def each
+    def load_all
       io = StringIO.new(@data, 'rb')
-      loop do
+      loop.each_with_index do |_, index|
         r = io.read(@stride)
         break unless r
-        yield format_record(r)
+        self[index] = format_record(r)
       end
+      self
     end
   end
 end
