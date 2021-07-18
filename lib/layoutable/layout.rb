@@ -11,7 +11,9 @@ module Layoutable
     end
 
     def listing
-      Tabulator.tabulate(self, start: addr_fmt, end: addr_fmt, length: '%d', label: '%s', note: '%s') do |label, info|
+      table = Tabulator.new(start: addr_fmt, end: addr_fmt, length: '%d', label: '%s', note: '%s')
+
+      table.tabulate(self) do |label, info|
         r = info[:range]
         r_end = r.reverse_each.first
         info.merge(start: r.first, end: r_end, length: r.count, label: label)
