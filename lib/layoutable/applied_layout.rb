@@ -11,7 +11,7 @@ module Layoutable
       @directory = directory
     end
 
-    attr_reader :directory
+    attr_reader :directory, :data
 
     def loader(dir, label)
       entry = @directory.fetch(label)

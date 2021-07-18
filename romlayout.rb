@@ -53,7 +53,11 @@ class RingsOfPower
     at 0x317e2, *data # Misc string data for building search response
     at 0x318c6, *code
 
-    at 0x43006, *data
+    at 0x4333a, *data
+    at 0x434c0, :lut_nibbleswap, Struct, 'C*'
+    at 0x435c0, :lut_hblit_offset, Struct, 'n*'
+    at 0x436e0, :lut_vblit_offset, Struct, 'n*'
+    at 0x43850, *data
 
     at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*'
     # at 0xb41e0, *data, :bytes # Approx address

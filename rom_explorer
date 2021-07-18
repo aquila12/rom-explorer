@@ -39,6 +39,18 @@ def item
   !@cwd || @cwd.empty ? @rom : @rom.dig(*@cwd)
 end
 
+def dump(string, start: 0, finish: nil, length: 0x200, width: 16)
+  finish ||= start + length - 1
+
+  unpack_format = 'H2' * width
+  addr_format = "0x%0#{finish.to_s(16).length}x"
+
+  (start..finish).step(width) do |offset|
+    row = string.byteslice(offset, width)&.unpack(unpack_format)
+    puts [format(addr_format, offset), *row].join(' ')
+  end
+end
+
 while (arg = ARGV.shift)
   case arg
   when '-r'
