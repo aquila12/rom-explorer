@@ -55,8 +55,8 @@ class RingsOfPower
 
     at 0x4333a, *data
     at 0x434c0, :lut_nibbleswap, Struct, 'C*'
-    at 0x435c0, :lut_hblit_offset, Struct, 'n*'
-    at 0x436e0, :lut_vblit_offset, Struct, 'n*'
+    at 0x435c0, :lut_hblit_offset, Struct, 'n*', note: '36-cell wide area for isometric view'
+    at 0x436e0, :lut_vblit_offset, Struct, 'n*', note: '24-cell high area for isometric view'
     at 0x43850, *data
 
     at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*'

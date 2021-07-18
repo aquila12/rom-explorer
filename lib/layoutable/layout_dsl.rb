@@ -27,10 +27,10 @@ module Layoutable
       raise ArgumentError, format('Offset %<o>x exceeds size %<s>x', o: offset, s: @size)
     end
 
-    def at(offset, label, type, *args)
+    def at(offset, label, type, *args, note: nil)
       check_offset! offset
 
-      @layout[offset] = [label, resolve_type(type, *args)]
+      @layout[offset] = [label, resolve_type(type, *args), note]
     end
 
     def size(size)
@@ -40,9 +40,9 @@ module Layoutable
     def build
       @layout[@size] = nil
       Layout.new.tap do |l|
-        @layout.sort.each_cons(2) do |(offset, (label, info)), (next_offset)|
+        @layout.sort.each_cons(2) do |(offset, (label, info, note)), (next_offset)|
           label = format(label, offset).to_sym if label.is_a? String
-          l.append(label, info, offset, next_offset)
+          l.append(label, info, offset, next_offset, note)
         end
       end
     end
