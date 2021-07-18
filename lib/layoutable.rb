@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'layoutable/layout'
 require_relative 'layoutable/layout_dsl'
 require_relative 'layoutable/applied_layout'
 require_relative 'layoutable/container'
@@ -19,15 +20,13 @@ module Layoutable
     def define_layout(&block)
       dsl = LayoutDSL.new
       dsl.instance_eval(&block)
-      @directory = dsl.generate_directory
-    end
-
-    attr_reader :directory
-
-    def apply_to(data)
-      AppliedLayout.new(data, directory)
+      @layout = dsl.build
     end
 
     attr_reader :layout
+
+    def apply_to(data)
+      AppliedLayout.new(data, layout)
+    end
   end
 end
