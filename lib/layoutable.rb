@@ -6,6 +6,7 @@ require_relative 'layoutable/container'
 require_relative 'layoutable/table'
 require_relative 'layoutable/struct'
 require_relative 'layoutable/bytes'
+require_relative 'layoutable/lzss_data'
 
 # Wrapper around layout DSL
 module Layoutable

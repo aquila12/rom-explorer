@@ -14,7 +14,7 @@ class RingsOfPower
     structure :directory, Table, 10, 'NNn', :offset, :length, :type
     structure :m68k, :bytes
     structure :lzss_file, :bytes  # One file
-    structure :lzss_files, :bytes # Multiple files (offset-indexed)
+    structure :lzss_files, Bytes, LZSSData, 'a*'
 
     at 0x00000, :reset_state, Struct, 'NN', :init_sp, :init_pc
     at 0x00008, *data
@@ -64,7 +64,7 @@ class RingsOfPower
     at 0xb86a0, *data, :bytes # Approx address
 
     at 0xb86ae, :portrait_directory, :directory
-    at 0xb8a32, :portrait_files, :lzss_files
+    at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels
     # Is this gap correct?
     at 0xccdb8, :menu_definitions, :bytes # Variable length structure
     at 0xcd430, :people_items, Table, 16, 'CZ*', :flags, :name

@@ -5,7 +5,7 @@ module Layoutable
   # NB: Index can be a range
   class Bytes < Container
     def record(index)
-      @data[index]
+      index.is_a?(Numeric) ? @data[index..] : @data[index]
     end
   end
 end
