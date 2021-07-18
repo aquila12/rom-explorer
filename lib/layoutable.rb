@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'layoutable/layout'
+require_relative 'layoutable/layout_dsl'
 require_relative 'layoutable/applied_layout'
 require_relative 'layoutable/container'
 require_relative 'layoutable/table'
@@ -17,13 +17,12 @@ module Layoutable
   # Class methods for layouts
   module ClassMethods
     def define_layout(&block)
-      @layout = Layout.new
-      @layout.instance_eval(&block)
+      dsl = LayoutDSL.new
+      dsl.instance_eval(&block)
+      @directory = dsl.generate_directory
     end
 
-    def directory
-      @layout.directory
-    end
+    attr_reader :directory
 
     def apply_to(data)
       AppliedLayout.new(data, directory)

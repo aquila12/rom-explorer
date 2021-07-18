@@ -2,7 +2,7 @@
 
 module Layoutable
   # Implementation of the layout DSL
-  class Layout
+  class LayoutDSL
     def initialize
       @size = 0
       @structure = {}
@@ -45,10 +45,6 @@ module Layoutable
         directory[label] = info.merge(range: offset...next_offset)
       end
       directory
-    end
-
-    def directory
-      @directory ||= generate_directory
     end
   end
 end
