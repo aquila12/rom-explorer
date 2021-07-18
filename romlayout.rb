@@ -13,7 +13,6 @@ class RingsOfPower
 
     structure :directory, Table, 10, 'NNn', :offset, :length, :type
     structure :m68k, :bytes
-    structure :lzss_file, :bytes  # One file
     structure :lzss_files, Bytes, LZSSData, 'a*'
 
     at 0x00000, :reset_state, Struct, 'NN', :init_sp, :init_pc
@@ -56,12 +55,12 @@ class RingsOfPower
 
     at 0x43006, *data
 
-    at 0xb3d49, :scrolltext_epilogue, :lzss_file
-    at 0xb41e0, *data, :bytes # Approx address
-    at 0xb6226, :scrolltext_credits, :lzss_file
-    at 0xb6680, *data, :bytes # Approx address
-    at 0xb83a7, :scrolltext_citizens, :lzss_file
-    at 0xb86a0, *data, :bytes # Approx address
+    at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*'
+    # at 0xb41e0, *data, :bytes # Approx address
+    at 0xb6221, :scrolltext_credits, LZSSData, 'a*'
+    # at 0xb6680, *data, :bytes # Approx address
+    at 0xb83a1, :scrolltext_citizens, LZSSData, 'a*'
+    # at 0xb86a0, *data, :bytes # Approx address
 
     at 0xb86ae, :portrait_directory, :directory
     at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels

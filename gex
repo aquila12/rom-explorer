@@ -18,9 +18,9 @@ def convert_palette(sega_cram_entries)
   end
 end
 
-def restripe(data, pw)
+def restripe(data, patterns_wide)
   patternlines = data.unpack('V*')
-  scanlines = patternlines.each_slice(8*pw).map do |block|
+  scanlines = patternlines.each_slice(8 * patterns_wide).map do |block|
     patterns = block.each_slice(8).to_a
     patterns.transpose
   end
@@ -44,9 +44,9 @@ when '-p'
   bmp.write(48, 48, bmp_palette, bmp_data)
 
   histogram = bmp_data.unpack1('H*').chars.group_by(&:itself).transform_values(&:length)
-  histogram.sort.each do |k,v|
+  histogram.sort.each do |k, v|
     i = k.to_i(16)
-    warn "%2d (0x%04x): %d entries" % [i, file[i], v]
+    warn format('%<index>2d (0x%<col>04x): %<count>d entries', index: i, col: file[i], count: v)
   end
 
   warn "#{histogram.count} used colours"
