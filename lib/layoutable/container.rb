@@ -8,7 +8,7 @@ module Layoutable
       self.default_proc = method(:loader)
 
       @data = data
-      @rowclass = rowinfo.first.is_a?(Class) ? @rowclass = rowinfo.shift : Struct
+      @rowclass = rowinfo.first.is_a?(String) ? Struct : rowinfo.shift
       @rowargs = rowinfo
     end
 

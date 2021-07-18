@@ -13,7 +13,7 @@ class LZSS
     @io = io
     @length = io.read(4).unpack1('V')
     @window = String.new(" " * 4096)
-    @windex = 0xfee
+    @windex = 0xfee       # Scratchpad write starts at -18
     @output = String.new
     @flag = flag_reader
     @byte = byte_reader
@@ -63,7 +63,7 @@ class LZSS
 
   def read_control_word
     ctrlw = @io.read(2).unpack1('v')
-    length = 3 + ctrlw[8..11]
+    length = 3 + ctrlw[8..11]         # 3..18
     index = (ctrlw[12..15] << 8) + ctrlw[0..7]
     [ length, index ]
   end
@@ -116,7 +116,7 @@ ROM = File.open(filename, 'rb') do |f|
 
     f.seek(DIR + 10 * filenum)
     warn "Entry %d at 0x%05x" % [filenum, f.pos]
-    if f.pos >= FILE  
+    if f.pos >= FILE
       warn "Seeked past end of table"
       exit 1
     end
@@ -137,7 +137,7 @@ ROM = File.open(filename, 'rb') do |f|
   when '-t'
     puts payload
   when '-g'
-    *palette, data = payload.unpack('n16a*')  
+    *palette, data = payload.unpack('n16a*')
     write_bitmap("graphic-#{filenum}.bmp", 48, 48, palette, restripe(data, 6))
 
     histogram = data.unpack1('H*').chars.group_by(&:itself).transform_values(&:length)
