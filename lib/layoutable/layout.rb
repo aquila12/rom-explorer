@@ -12,6 +12,7 @@ module Layoutable
 
     def listing
       table = Tabulator.new(start: addr_fmt, end: addr_fmt, length: '%d', label: '%s', note: '%s')
+      table.align :left, :note
 
       table.tabulate(self) do |label, info|
         r = info[:range]

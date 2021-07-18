@@ -4,6 +4,12 @@
 class Tabulator
   def initialize(**fmt)
     @format = fmt
+    @align = Hash.new(1)
+  end
+
+  def align(side, *fields)
+    alignment = side == :left ? -1 : 1
+    fields.each { |f| @align[f] = alignment }
   end
 
   def tabulate(...)
@@ -27,8 +33,9 @@ class Tabulator
   end
 
   def justified_format(table)
-    table.transpose.map do |col|
-      "%#{col.map(&:length).max}s"
+    alignments = @format.keys.map { |k| @align[k] }
+    table.transpose.each_with_index.map do |col, index|
+      "%#{col.map(&:length).max * alignments[index]}s"
     end.join(' ')
   end
 end
