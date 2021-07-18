@@ -4,29 +4,17 @@ require 'stringio'
 
 module Layoutable
   # Implementation of a table container with fixed-size records
-  class Table < Hash
+  class Table < Container
     def initialize(data, stride, *rowinfo)
-      super()
-      self.default_proc = method(:loader)
-
-      @data = data
       @stride = stride
-      @rowclass = rowinfo.first.is_a?(Class) ? @rowclass = rowinfo.shift : Struct
-      @rowargs = rowinfo
+      super(data, *rowinfo)
     end
 
     def record(index)
       @data.byteslice(index * @stride, @stride)
     end
 
-    def format(record)
-      @rowclass.new(record, *@rowargs)
-    end
-
-    def loader(tbl, index)
-      tbl[index] = format(record(index))
-    end
-
+    # This feels wrong here, but it didn't fall out in refactor
     def load_all
       io = StringIO.new(@data, 'rb')
       loop.each_with_index do |_, index|

@@ -2,6 +2,7 @@
 
 require_relative 'layoutable/layout'
 require_relative 'layoutable/applied_layout'
+require_relative 'layoutable/container'
 require_relative 'layoutable/table'
 require_relative 'layoutable/struct'
 require_relative 'layoutable/bytes'
