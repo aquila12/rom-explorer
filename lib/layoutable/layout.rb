@@ -42,7 +42,7 @@ module Layoutable
       directory = {}
       @layout.sort.each_cons(2) do |(offset, (label, info)), (next_offset)|
         label = format(label, offset).to_sym if label.is_a? String
-        @directory[label] = info.merge(range: offset...next_offset)
+        directory[label] = info.merge(range: offset...next_offset)
       end
       directory
     end
