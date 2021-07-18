@@ -6,30 +6,10 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 
 require 'layoutable'
+require 'bmp_writer'
 require_relative 'romlayout'
 
 ROM = RingsOfPower.apply_to(File.binread(ARGV.shift))
-
-def write_bitmap(filename, width, height, palette, data)
-  File.open(filename, 'wb') do |f|
-    f.write 'BM'
-    sizepos = f.pos
-    f.write [0, 0, 0].pack('Vvv')
-    px_offspos = f.pos
-    f.write [0, 40, width, -height].pack('V*')
-    f.write [1, 4, 0, 0, 0, 0, 0, 0].pack('vvV*')
-    f.write(palette.flatten.pack('C*'))
-
-    px_offset = f.pos
-    f.write data
-    size = f.pos
-
-    f.seek(sizepos)
-    f.write [size].pack('V')
-    f.seek(px_offspos)
-    f.write [px_offset].pack('V')
-  end
-end
 
 def convert_palette(sega_cram_entries)
   sega_cram_entries.map do |c|
@@ -60,7 +40,8 @@ when '-p'
   bmp_palette = convert_palette(file.values_at(*(0..15).to_a))
   bmp_data = restripe(file[:pixels], 6)
 
-  write_bitmap("portrait-#{filenum}.bmp", 48, 48, bmp_palette, bmp_data)
+  bmp = BMPWriter.new("portrait-#{filenum}.bmp")
+  bmp.write(48, 48, bmp_palette, bmp_data)
 
   histogram = bmp_data.unpack1('H*').chars.group_by(&:itself).transform_values(&:length)
   histogram.sort.each do |k,v|
