@@ -26,6 +26,7 @@ end
 def wordstring(start, length)
   range = start...(start + length)
   wvector = ROM[:paragraph_wordlists][range]
+  wvector = [wvector] unless wvector.is_a? Array
   words = wvector.map(&method(:word))
   words.join
 end
