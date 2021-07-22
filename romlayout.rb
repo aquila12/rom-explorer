@@ -71,7 +71,8 @@ class RingsOfPower
     at 0xb86ae, :portrait_directory, :directory
     at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels,
       note: 'Pixels are 8x8 cells in reading order'
-    # Is this gap correct?
+    at 0xcc9d8, :palettes, Table, 32, Struct, 'n*', note: '16-colour 16-bit packed 0bgr x 31 entries'
+
     at 0xccdb8, :menu_definitions, :bytes, note: 'Variable length Z6C6{Z6C8}[] - Static menus'
     at 0xcd430, :menu_words, Table, 16, 'CZ*', :flags, :name, note: 'Also includes character names'
     at 0xcecf0, *data
