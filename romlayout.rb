@@ -72,18 +72,20 @@ class RingsOfPower
     at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels,
       note: 'Pixels are 8x8 cells in reading order'
     # Is this gap correct?
-    at 0xccdb8, :menu_definitions, :bytes, note: 'Variable length Z6C6{Z6C8}[]'
-    at 0xcd430, :menu_words, Table, 16, 'CZ*', :flags, :name
+    at 0xccdb8, :menu_definitions, :bytes, note: 'Variable length Z6C6{Z6C8}[] - Static menus'
+    at 0xcd430, :menu_words, Table, 16, 'CZ*', :flags, :name, note: 'Also includes character names'
     at 0xcecf0, *data
 
-    at 0xcf1b0, *table, 24, 'a*'
+    at 0xcf1ac, *table, 24, 'a*'
     at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :unk1, :unk2, :unk3, :unk4, :long, :lat, :floor, :type
 
     at 0xd2ec2, *table, 12, 'a*'
     at 0xd601e, *table, 6, 'a*'
-    at 0xd66a2, :item_lists, Table, 10, 'ccnnnn', :unk1, :count, :unk2, :menu_word, :table_offset1, :unk4, note: 'Indexes item_values'
-    at 0xd676a, :item_values, Table, 4, 'nn', :value, :menu_word, note: 'Game logic LUTs e.g. buy/sell pricepoints'
-    at 0xd6b6a, *data, note: 'nul bytes'
+    at 0xd63e4, *table, 4, 'a*'
+    at 0xd66a0, :item_lists, Table, 10, 'ccccnnn', :unk1, :unk2, :unk3, :count, :unk4, :menu_word, :table_offset, note: 'Indexes item_values'
+    at 0xd6768, :item_values, Table, 4, 'nn', :menu_word, :value, note: 'Game logic LUTs e.g. pricepoints, paper paragraph index'
+    at 0xd6b6c, :spells, Table, 6, 'Nn', :packed_data, :mana_cost, note: 'xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow'
+    at 0xd6e60, :class_levels, Table, 10, Table, 1, 'C', :spell_limit, note: 'Can cast anything less than limit'
 
     at 0xd6eba, :dictionary, Bytes, String
     at 0xdc0c0, *data
