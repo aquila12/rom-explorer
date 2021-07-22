@@ -54,7 +54,7 @@ end
 def extract_bin(string, filename, start: 0, finish: nil, length: nil)
   finish ||= start + length - 1 if length
 
-  File.binwrite filename, string[start...finish]
+  File.binwrite filename, string[start..finish]
 end
 
 while (arg = ARGV.shift)
