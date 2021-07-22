@@ -23,8 +23,9 @@ class RingsOfPower
 
     at 0x002fa, *code
     at 0x0dd5c, :decompress_lzss, :m68k, note: 'Compression type 1, LZSS 4k sliding window'
-    at 0x0de1a, :decompress_type0, :m68k, note: 'Compression type 0'
-    at 0x0df58, *data
+    at 0x0de1a, :decompress_plain, :m68k, note: 'Compression type 0, straight data'
+    at 0x0df58, *table, 4, 'N', note: 'Raw addresses into the ROM to the following section'
+    at 0x0e358, *code, note: 'Lots of unrolled loops and unconditional branch to e3e2 - maybe blitter?'
 
     at 0x1107a, *code
     at 0x12072, :void_found_you, :m68k, note: 'May be an exception handler'
@@ -59,7 +60,8 @@ class RingsOfPower
     at 0x434c0, :lut_nibbleswap, Struct, 'C*'
     at 0x435c0, :lut_hblit_offset, Struct, 'n*', note: '36-cell wide area for isometric view'
     at 0x436e0, :lut_vblit_offset, Struct, 'n*', note: '24-cell high area for isometric view'
-    at 0x43850, *data
+    at 0x43850, :map_directory, :directory
+    at 0x44228, :map_files, Bytes, LZSSData, 'n*', note: '99x 32x32 maps (inc world), 153x 11x11 maps'
 
     at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
     # at 0xb41e0, *data, :bytes # Approx address
@@ -99,5 +101,6 @@ class RingsOfPower
     at 0xed0e8, *data
 
     at 0xfd07c, :ea_checksum, :m68k, note: 'Sum 0x3f41f dwords from 0x0, skipping 0x18c, compare'
+    at 0xfd0cc, :wabbits, note: 'ff ff ff ff...'
   end
 end
