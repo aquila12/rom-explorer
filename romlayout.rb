@@ -106,6 +106,6 @@ class RingsOfPower
     at 0xed0e8, *data
 
     at 0xfd07c, :ea_checksum, :m68k, note: 'Sum 0x3f41f dwords from 0x0, skipping 0x18c, compare'
-    at 0xfd0cc, :wabbits, note: 'ff ff ff ff...'
+    at 0xfd0cc, :wabbits, :bytes, note: 'ff ff ff ff...'
   end
 end
