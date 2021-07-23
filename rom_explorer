@@ -51,6 +51,21 @@ def dump(string, start: 0, finish: nil, length: 0x200, width: 16)
   end
 end
 
+def factorize(n)
+  f = []
+  d = 2
+  while(n > 1)
+    q, r = n.divmod(d)
+    if r.zero?
+      f << d
+      n = q
+    else
+      d += 1
+    end
+  end
+  f
+end
+
 def extract_bin(string, filename, start: 0, finish: nil, length: nil)
   finish ||= start + length - 1 if length
 
