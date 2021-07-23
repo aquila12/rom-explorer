@@ -9,6 +9,7 @@ class RingsOfPower
 
     code = ['code_%05x', :m68k]
     data = ['data_%05x', :bytes]
+    lzss = ['lzss_%05x', LZSSData, 'a*']
     table = ['tabl_%05x', Table]
 
     structure :directory, Table, 10, 'NNn', :offset, :length, :type
@@ -62,13 +63,17 @@ class RingsOfPower
     at 0x436e0, :lut_vblit_offset, Struct, 'n*', note: '24-cell high area for isometric view'
     at 0x43850, :map_directory, :directory
     at 0x44228, :map_files, Bytes, LZSSData, 'n*', note: '99x 32x32 maps (inc world), 153x 11x11 maps'
+    at 0x5edc4, *data
+    at 0x5f524, *table, 4, 'N'
+    at 0x603e4, *data
 
     at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
-    # at 0xb41e0, *data, :bytes # Approx address
+    at 0xb41da, *lzss
+    at 0xb5b33, *lzss
+    at 0xb5e0c, *lzss
     at 0xb6221, :scrolltext_credits, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
-    # at 0xb6680, *data, :bytes # Approx address
+    at 0xb666c, *lzss
     at 0xb83a1, :scrolltext_citizens, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
-    # at 0xb86a0, *data, :bytes # Approx address
 
     at 0xb86ae, :portrait_directory, :directory
     at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels,
