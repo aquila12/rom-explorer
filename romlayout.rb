@@ -57,7 +57,7 @@ class RingsOfPower
     at 0x317e2, *data, note: 'Misc string data for building search response'
     at 0x318c6, *code
 
-    at 0x4333a, *data
+    at 0x4333a, *code, note: 'This might not be the start of the code!'
     at 0x434c0, :lut_nibbleswap, Struct, 'C*'
     at 0x435c0, :lut_hblit_offset, Struct, 'n*', note: '36-cell wide area for isometric view'
     at 0x436e0, :lut_vblit_offset, Struct, 'n*', note: '24-cell high area for isometric view'
