@@ -62,10 +62,10 @@ class RingsOfPower
     at 0x435c0, :lut_hblit_offset, Struct, 'n*', note: '36-cell wide area for isometric view'
     at 0x436e0, :lut_vblit_offset, Struct, 'n*', note: '24-cell high area for isometric view'
     at 0x43850, :map_directory, :directory
-    at 0x44228, :map_files, Bytes, LZSSData, 'n*', note: '99x 32x32 maps (inc world), 153x 11x11 maps'
+    at 0x44228, :map_files, Bytes, LZSSData, 'n*', note: 'World (77), generic (32), room (121), big room (22)'
     at 0x5edc4, *data
-    at 0x5f524, *table, 4, 'N'
-    at 0x603e4, *data
+    at 0x5f524, *table, 4, 'N', note: 'Indexes data at 0x603e4'
+    at 0x603e4, *data, note: 'Appears to be image data, likely prepends scanline byte length, 00 = end'
 
     at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
     at 0xb41da, *lzss
