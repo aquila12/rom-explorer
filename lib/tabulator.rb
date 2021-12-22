@@ -26,8 +26,9 @@ class Tabulator
   end
 
   def table(data)
-    data.map do |el|
+    data.map.with_index do |el, i|
       row = block_given? ? yield(el) : el
+      row.merge!(_index: i)
       @format.map { |col, f| format(f, row[col]) }
     end
   end
