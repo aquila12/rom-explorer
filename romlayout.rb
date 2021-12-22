@@ -44,7 +44,7 @@ class RingsOfPower
     at 0x1a990, :text_status_mood, Table, 16, 'Z*'
     at 0x1aa60, :text_status_level, Table, 90, Table, 10, 'Z*', note: 'Untrained has no level vector'
     at 0x1ade4, *data
-    at 0x1b298, :city_goods, Table, 2, 'CC', :export, :import, note: 'Half or double price'
+    at 0x1b298, :city_goods, Table, 2, 'cc', :export, :import, note: 'Half or double price'
     at 0x1b2e0, *data
     at 0x1b320, :text_title_scroller, Table, 42, 'a*'
     at 0x1b446, *data
