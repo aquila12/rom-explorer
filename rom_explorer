@@ -9,7 +9,8 @@ require 'layoutable'
 require 'irb'
 
 def rom(filename)
-  @data = File.binread(filename)
+  @path = filename
+  @data = File.binread(@path)
   @data.length.tap { |l| puts "Loaded #{l} bytes" }
 end
 
@@ -70,6 +71,14 @@ def extract_bin(string, filename, start: 0, finish: nil, length: nil)
   finish ||= start + length - 1 if length
 
   File.binwrite filename, string[start..finish]
+end
+
+def dis(label)
+  section = @rom.directory[label]
+  raise ArgumentError, "No section #{label}" unless section
+
+  start, stop = section[:range].minmax
+  puts `m68k-linux-gnu-objdump -b binary -m m68k -S -D rings.bin --start-address=#{start} --stop-address=#{stop}`
 end
 
 while (arg = ARGV.shift)
