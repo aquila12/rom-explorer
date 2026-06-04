@@ -44,6 +44,8 @@ module Layoutable
           label = format(label, offset).to_sym if label.is_a? String
           l.append(label, info, offset, next_offset, note)
         end
+
+        l.listing
       end
     end
   end
