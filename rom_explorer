@@ -30,14 +30,14 @@ def cd(*args)
     when '..' then @cwd.pop
     when '.' then @cwd
     when '/' then @cwd = []
-    else @cwd << d
+    else cwd << d
     end
   end
   item
 end
 
 def item
-  !@cwd || @cwd.empty ? @rom : @rom.dig(*@cwd)
+  !@cwd || @cwd.empty? ? @rom : @rom.dig(*@cwd)
 end
 
 def dump(string, start: 0, finish: nil, length: 0x200, width: 16)
