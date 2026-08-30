@@ -49,6 +49,10 @@ while param = ARGV.shift
       tile = t[0..8]
       version = t[12].zero? ? :normal : :mirror
       entry = lookup[tile][version]
+
+      # Frob to avoid the sentinel data when attempting to render non-world maps
+      next nil if entry.zero? unless tile < 4
+
       [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
     end
 
