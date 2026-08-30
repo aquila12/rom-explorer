@@ -9,46 +9,120 @@ require 'layoutable'
 require 'bmp_writer'
 require_relative 'romlayout'
 
-ROM = RingsOfPower.apply_to(File.binread(ARGV.shift))
+romfile = ARGV.shift
+warn 'No ROM specified' unless romfile
+ROM = RingsOfPower.apply_to(File.binread(romfile))
 
-def convert_palette(sega_cram_entries)
-  sega_cram_entries.map do |c|
+def lzss_load(directory, files, index)
+  entry = ROM[directory][index]
+
+  warn "#{directory}[#{index}] is type #{type} - this could go un-well!" unless entry[:type] == 1
+  ROM[files][entry[:offset]]
+end
+
+while param = ARGV.shift
+  arg = ARGV.shift.to_i
+
+  case param
+  when '-p' # Extract portrait
+    @outname = "portrait-#{arg}"
+    file = lzss_load(:portrait_directory, :portrait_files, arg)
+
+    @sega_palette = file.values_at(*(0..15).to_a)
+    @pattern_pixels = file[:pixels]
+
+    @pattern_grid = Array.new(36) { |n| n }
+    @cells_wide = 6
+
+  when '-m' # Extract map
+    @outname = "map-#{arg}"
+    @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*')
+    lookup = ROM[:ingame_map_lookup]
+    @pattern_grid.map! do |t|
+      tile = t & 0x1ff
+      version = (t & 0x1000).zero? ? :normal : :mirror
+      lookup[tile][version]
+    end
+    # @pattern_pixels = TODO
+    @cells_wide = arg < 77 || arg >= 230 ? 32 : 11
+
+  when '-c' # Specify palette colours (raw palette)
+    @palette_number = arg
+
+  when '-g' # Specify pattern grid (LZSS resource)
+    @outname = "grid-#{arg}"
+    @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*')
+
+  when '-i' # Specify pattern image pixels
+    filenum = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*')
+    # @pattern_pixels = @rom[:]
+
+  when '-w' # Specify output width (in cells)
+
+  end
+end
+
+def convert_palette
+  @sega_palette.map do |c|
     rgba = [c[8..11], c[4..7], c[0..3], c[12..15]]
     rgba.map { |ch| ch * 0x12 }
   end
 end
 
-def restripe(data, patterns_wide)
-  patternlines = data.unpack('V*')
-  scanlines = patternlines.each_slice(8 * patterns_wide).map do |block|
-    patterns = block.each_slice(8).to_a
-    patterns.transpose
-  end
-
-  scanlines.flatten.pack('V*')
+def default_palette
+  bright = [0x00, 0x66]
+  value = [0x00, 0x99]
+  Array.new(16) { |n|
+    i = bright[n[3]]
+    [i + value[n[0]], i + value[n[1]], i + value[n[2]], 0]
+  }
 end
 
-case ARGV.shift
-when '-p'
-  filenum = ARGV.shift.to_i
-  entry = ROM[:portrait_directory][filenum]
+def calibrate_grid!
+  # Default to making a squareish dump image
+  length = @pattern_grid.length
+  @cells_wide ||= (length ** 0.5).floor
 
-  warn "Type #{type} isn't recognised, this could go un-well!" unless entry[:type] == 1
+  d, m = length.divmod(@cells_wide)
+  @cells_high = m.zero? ? d : d + 1
+  @pattern_grid += [nil] * m
+end
 
-  file = ROM[:portrait_files][entry[:offset]]
+def restripe_data
+  cells = @pattern_grid.each_slice(@cells_wide).to_a
+  patterns = @pattern_pixels.unpack('V*').each_slice(8).to_a
 
-  bmp_palette = convert_palette(file.values_at(*(0..15).to_a))
-  bmp_data = restripe(file[:pixels], 6)
+  (8 * @cells_high).times.flat_map do |y|
+    row, line = y.divmod(8)
+    Array.new(@cells_wide) do |col|
+      p = cells[row][col]
+      p ? patterns[p][line] : 0
+    end
+  end.pack('V*')
+end
 
-  bmp = BMPWriter.new("portrait-#{filenum}.bmp")
-  bmp.write(48, 48, bmp_palette, bmp_data)
-
-  histogram = bmp_data.unpack1('H*').chars.group_by(&:itself).transform_values(&:length)
+def dump_histogram
+  histogram = @bmp_data.unpack1('H*').chars.tally
   histogram.sort.each do |k, v|
     i = k.to_i(16)
-    warn format('%<index>2d (0x%<col>04x): %<count>d entries', index: i, col: file[i], count: v)
+    warn format('%<index>2d: %<count>d entries', index: i, count: v)
   end
 
   warn "#{histogram.count} used colours"
   warn "#{histogram.values.sum} pixels"
 end
+
+@sega_palette = @sega_palette = @rom[:palettes][@palette_number] if @palette_number
+rgb0_palette = @sega_palette ? convert_palette : default_palette
+warn "Palette: #{rgb0_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
+
+warn "Grid size: #{@pattern_grid.length} entries"
+
+calibrate_grid!
+warn "Geometry: #{@cells_wide} x #{@cells_high} cells"
+
+@bmp_data = restripe_data
+dump_histogram
+
+bmp = BMPWriter.new("#{@outname}.bmp")
+bmp.write(@cells_wide * 8, @cells_high * 8, rgb0_palette, @bmp_data)
