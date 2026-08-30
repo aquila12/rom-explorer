@@ -45,7 +45,7 @@ module Layoutable
           l.append(label, info, offset, next_offset, note)
         end
 
-        l.listing
+        l.listing if ENV.key? 'DUMP_LISTING'
       end
     end
   end
