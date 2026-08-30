@@ -21,7 +21,13 @@ def lzss_load(directory, files, index)
 end
 
 while param = ARGV.shift
-  arg = ARGV.shift.to_i
+  tail = param[2..] || ''
+  if tail.empty?
+    arg = ARGV.shift.to_i
+  else
+    arg = tail.to_i
+    param = param[0..1]
+  end
 
   case param
   when '-p' # Extract portrait
