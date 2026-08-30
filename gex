@@ -52,7 +52,9 @@ while param = ARGV.shift
     @palette_number = arg
   when '-g' # Specify pattern grid (LZSS resource)
     @outname ||= "grid-#{arg}"
-    @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*')
+    @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*').map do |e|
+      [e[0..10], e[11].nonzero?, e[12].nonzero?]
+    end
   when '-i' # Specify pattern image pixels
     @outname ||= "patterns-#{arg}"
     @pattern_pixels = lzss_load(:lzss_directory, :lzss_files, arg)
