@@ -68,15 +68,10 @@ class RingsOfPower
     at 0x603e4, *data, note: 'Appears to be image data, likely prepends scanline byte length, 00 = end'
 
     at 0x96120, :lzss_directory, :directory
-    at 0x9638c, :lzss_resource_0, LZSSData, 'a*'
-
-    at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
-    at 0xb41da, *lzss
-    at 0xb5b33, *lzss
-    at 0xb5e0c, *lzss
-    at 0xb6221, :scrolltext_credits, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
-    at 0xb666c, *lzss
-    at 0xb83a1, :scrolltext_citizens, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
+    at 0x9638c, :lzss_files, Bytes, LZSSData, 'a*'
+    # at 0xb3d40, :scrolltext_epilogue, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
+    # at 0xb6221, :scrolltext_credits, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
+    # at 0xb83a1, :scrolltext_citizens, LZSSData, 'a*', note: 'Images are signalled by 0x80 + portraid id'
 
     at 0xb86ae, :portrait_directory, :directory
     at 0xb8a32, :portrait_files, Bytes, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels,
