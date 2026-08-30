@@ -21,16 +21,15 @@ def lzss_load(directory, files, index)
 end
 
 while param = ARGV.shift
-  tail = param[2..] || ''
-  if tail.empty?
-    arg = ARGV.shift.to_i
-  else
-    arg = tail.to_i
-    param = param[0..1]
+  if param =~ /^-(\w)(.*)/
+    param = $1
+    ARGV.unshift $2 unless $2.empty?
   end
 
+  arg = ARGV.shift.to_i if 'pmcgiw'.include? param
+
   case param
-  when '-p' # Extract portrait
+  when 'p' # Extract portrait
     @outname = "portrait-#{arg}"
     file = lzss_load(:portrait_directory, :portrait_files, arg)
 
@@ -38,7 +37,7 @@ while param = ARGV.shift
     @pattern_pixels = file[:pixels]
     @cells_wide = 6
 
-  when '-m' # Extract map
+  when 'm' # Extract map
     @outname = "map-#{arg}"
     @pattern_pixels = lzss_load(:lzss_directory, :lzss_files, 10)
     @palette_number = 10
@@ -53,19 +52,22 @@ while param = ARGV.shift
       [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
     end
 
-  when '-c' # Specify palette colours (raw palette)
+  when 'c' # Specify palette colours (raw palette)
     @outname ||= "palette-#{arg}"
     @palette_number = arg
-  when '-g' # Specify pattern grid (LZSS resource)
+  when 'g' # Specify pattern grid (LZSS resource)
     @outname ||= "grid-#{arg}"
     @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*').map do |e|
       [e[0..10], e[11].nonzero?, e[12].nonzero?]
     end
-  when '-i' # Specify pattern image pixels
+  when 'i' # Specify pattern image pixels
     @outname ||= "patterns-#{arg}"
     @pattern_pixels = lzss_load(:lzss_directory, :lzss_files, arg)
-  when '-w' # Specify output width (in cells)
+  when 'w' # Specify output width (in cells)
     @cells_wide = arg
+  else
+    warn "Unknown parameter -#{param}"
+    exit 1
   end
 end
 
