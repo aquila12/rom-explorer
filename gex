@@ -41,8 +41,8 @@ while param = ARGV.shift
     lookup = ROM[:ingame_map_lookup].load_all
     map_grid = lzss_load(:map_directory, :map_files, arg)
     @pattern_grid = map_grid.map do |t|
-      tile = t & 0x1ff
-      version = (t & 0x1000).zero? ? :normal : :mirror
+      tile = t[0..8]
+      version = t[12].zero? ? :normal : :mirror
       entry = lookup[tile][version]
       [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
     end
