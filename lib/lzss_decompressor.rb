@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# Reverse-engineered from the Rings of Power implementation
+#
+# This appears to be the same algorithm as in Okumura's implementation
+# (down to the constants chosen and the flag and control word storage)
+# See: http://web.archive.org/web/19990209183635/http://oak.oakland.edu/pub/simtelnet/msdos/arcutils/lz_comp2.zip
+
 # LSZZ 4k sliding window decompressor
 class LZSSDecompressor
   def self.decompress(io)
