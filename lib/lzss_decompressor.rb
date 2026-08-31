@@ -8,13 +8,13 @@
 
 # LSZZ 4k sliding window decompressor
 class LZSSDecompressor
-  def self.decompress(io)
-    new(io).result
+  def self.decompress(io, length: io.read(4).unpack1('V'))
+    new(io, length).result
   end
 
-  def initialize(io)
+  def initialize(io, length)
     @io = io
-    @length = io.read(4).unpack1('V')
+    @length = length
     @window = String.new(' ' * 4096)
     @windex = 0xfee # Scratchpad write starts at -18
     @output = String.new(capacity: @length)
