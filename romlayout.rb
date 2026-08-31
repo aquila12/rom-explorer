@@ -87,8 +87,10 @@ class RingsOfPower
     at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :unk1, :unk2, :unk3, :unk4, :long, :lat, :floor, :type
 
     at 0xd2ec2, *table, 12, 'a*'
-    at 0xd601e, *table, 6, 'a*'
-    at 0xd63e4, *table, 4, 'a*'
+    at 0xd301e, *table, 6, 'a*'
+    at 0xd3102, *table, 12, 'a*'
+    at 0xd601e, :lockables_table, Table, 6, 'nncc', :flags1, :flags2, :local_lon, :local_lat, note: 'Matches quest flag index'
+    at 0xd63e4, :locations_something, Table, 4, 'c*', note: 'Indexed by location ID'
     at 0xd66a0, :item_lists, Table, 10, 'ccccnnn', :unk1, :unk2, :unk3, :count, :unk4, :menu_word, :table_offset, note: 'Indexes item_values'
     at 0xd6768, :item_values, Table, 4, 'nn', :menu_word, :value, note: 'Game logic LUTs e.g. pricepoints, paper paragraph index'
     at 0xd6b6c, :spells, Table, 6, 'Nn', :packed_data, :mana_cost, note: 'xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow'
