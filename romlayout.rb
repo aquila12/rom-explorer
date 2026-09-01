@@ -65,8 +65,8 @@ class RingsOfPower
     at 0x43850, :map_directory, :directory
     at 0x44228, :map_files, Bytes, LZSSData, 'n*', note: 'World (77), generic (32), room (121), big room (22)'
     at 0x5edc4, *data
-    at 0x5f524, *table, 4, 'N', note: 'Indexes data at 0x603e4'
-    at 0x603e4, *data, note: 'Appears to be image data, likely prepends scanline byte length, 00 = end'
+    at 0x5f524, :isotile_index, Table, 4, 'N', note: 'Indexes data at 0x603e4'
+    at 0x603e4, :isotile_data, Bytes, Struct, 'a*', note: 'Image scanlines with flags - 00 = end - len/off; *pixels'
 
     at 0x96120, :lzss_directory, :directory
     at 0x9638c, :lzss_files, Bytes, LZSSData, 'a*'

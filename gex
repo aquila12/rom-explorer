@@ -7,6 +7,7 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 
 require 'layoutable'
 require 'bmp_writer'
+require 'rop_iso_extractor'
 require_relative 'romlayout'
 
 romfile = ARGV.shift
@@ -26,7 +27,7 @@ while param = ARGV.shift
     ARGV.unshift $2 unless $2.empty?
   end
 
-  arg = ARGV.shift.to_i if 'pmcgisw'.include? param
+  arg = ARGV.shift.to_i if 'pmtcgisw'.include? param
 
   case param
   when 'p' # Extract portrait
@@ -55,6 +56,19 @@ while param = ARGV.shift
 
       [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
     end
+
+  when 't' # Extract isometric tile
+    @outname = "tile-#{arg}"
+    start = ROM[:isotile_index][arg]
+    tile = ROPISOExtractor.new(ROM[:isotile_data][start])
+    @px_wide = tile.width
+    @px_high = tile.height
+    @bmp_data = tile.pixels
+    @palette_number = 10
+    @mask_colour = [0xff, 0, 0xff, 0]
+    exit 1 if @bmp_data.empty?
+
+    warn "Linear raster #{@px_wide} x #{@px_high}"
 
   when 'c' # Specify palette colours (raw palette)
     @outname ||= "palette-#{arg}"
@@ -152,6 +166,8 @@ end
 
 @sega_palette = ROM[:palettes][@palette_number] if @palette_number
 rgb0_palette = @sega_palette ? convert_palette : default_palette
+rgb0_palette[0] = @mask_colour if @mask_colour
+
 warn "Palette: #{rgb0_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
 
 # No pixels or grid - palette swatch
@@ -159,16 +175,21 @@ unless @pattern_pixels || @pattern_grid
   @pattern_pixels = 16.times.flat_map { |n| [n * 0x11111111] * 8 }.pack('V*')
 end
 
-@pattern_grid ||= generate_grid
-# @pattern_pixels ||= TODO
+unless @bmp_data
+  @pattern_grid ||= generate_grid
+  # @pattern_pixels ||= TODO
 
-warn "Grid size: #{@pattern_grid.length} entries"
+  warn "Grid size: #{@pattern_grid.length} entries"
 
-calibrate_grid!
-warn "Geometry: #{@cells_wide} x #{@cells_high} cells"
+  calibrate_grid!
+  warn "Geometry: #{@cells_wide} x #{@cells_high} cells"
 
-@bmp_data = restripe_data
+  @bmp_data = restripe_data
+end
+
+@px_wide ||= @cells_wide * 8
+@px_high ||= @cells_high * 8
 dump_histogram
 
 bmp = BMPWriter.new("#{@outname}.bmp")
-bmp.write(@cells_wide * 8, @cells_high * 8, rgb0_palette, @bmp_data)
+bmp.write(@px_wide, @px_high, rgb0_palette, @bmp_data)
