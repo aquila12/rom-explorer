@@ -1,0 +1,8 @@
+#!/bin/bash
+
+OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink"
+
+montage $OPTIONS tiles/tile-{{288..447},{592..815},{928..943},{448..463}}.bmp tiles-people.png
+montage $OPTIONS tiles/tile-{{512..559},{816..927}}.bmp tiles-battle.png
+montage $OPTIONS tiles/tile-{{0..287},{464..511},{560..589}}.bmp tiles-terrain.png
+
