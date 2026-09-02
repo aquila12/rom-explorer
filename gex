@@ -70,6 +70,11 @@ while param = ARGV.shift
 
     warn "Linear raster #{@px_wide} x #{@px_high}"
 
+  when 'd' # Extract dumped RAM
+    dump = ARGV.shift
+    @pattern_pixels = File.binread(dump)
+    @outname = dump.sub(/\.[^.]*$/, '')
+
   when 'M' # Specify mask colour (HTML notation)
     @mask_colour = ARGV.shift
     @mask_colour = @mask_colour[1..] if @mask_colour.start_with? '#'
