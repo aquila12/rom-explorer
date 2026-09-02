@@ -88,6 +88,10 @@ while param = ARGV.shift
     @sprite_h = arg
   when 'w' # Specify output width (in cells)
     @cells_wide = arg
+  when 'o' # Specify data offset (in cells) - drops image pixels
+    @skip_cells = arg
+  when 'l' # Specify data length (in cells) - drops image pixels
+    @cell_count = arg
   else
     warn "Unknown parameter -#{param}"
     exit 1
@@ -179,6 +183,9 @@ unless @pattern_pixels || @pattern_grid
 end
 
 unless @bmp_data
+  @pattern_pixels = @pattern_pixels[32 * @skip_cells..] if @skip_cells
+  @pattern_pixels = @pattern_pixels[...32 * @cell_count] if @cell_count
+
   @pattern_grid ||= generate_grid
   # @pattern_pixels ||= TODO
 
