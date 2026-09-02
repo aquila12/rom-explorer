@@ -1,10 +1,9 @@
 #!/bin/bash
 
-OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink -font FreeMono-Bold -pointsize 9 +set label"
-
 convert -size 1x1 xc:transparent empty.bmp
 
 [ -d tiles/ ] || mkdir tiles
+[ -d palettes/ ] || mkdir palettes
 
 (
   cd tiles/
@@ -20,6 +19,22 @@ convert -size 1x1 xc:transparent empty.bmp
     fi
   done
 )
+
+(
+  cd palettes/
+  for n in {0..31}
+  do
+    file="palette-$n.bmp"
+
+    if ! [ -f "$file" ]
+    then
+      echo "Extract $file..."
+      ../../gex ../../rings.bin -c "$n" -w16
+    fi
+  done
+)
+
+OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink -font FreeMono-Bold -pointsize 9 +set label"
 
 [ -f tiles-all.png ] ||
 montage $OPTIONS \
@@ -49,3 +64,23 @@ montage $OPTIONS \
   label:{0x1d0,+{1..9},+{a..f}} tiles/tile-{464..511}.bmp \
   label:{0x230,+{1..9},+{a..f}} tiles/tile-{560..589}.bmp \
   tiles-terrain.png
+
+
+OPTIONS="-border 0 -tile 1x -geometry +1+1 -extent 128x -gravity north -background pink +set label -pointsize 10"
+
+[ -f palettes-all.png ] ||
+montage $OPTIONS palettes/palette-{0..31}.bmp palettes-all.png
+
+[ -f palettes-world.png ] ||
+montage $OPTIONS \
+  label:'Regular palettes:' \
+  palettes/palette-10.bmp label:Day \
+  palettes/palette-19.bmp label:Night \
+  palettes/palette-23.bmp label:Underwater \
+  empty.bmp empty.bmp \
+  label:'Flash palettes:' \
+  palettes/palette-20.bmp label:Blinding \
+  palettes/palette-21.bmp label:Frozen \
+  palettes/palette-22.bmp label:Fire \
+  palettes/palette-24.bmp label:Lightning \
+  palettes-world.png
