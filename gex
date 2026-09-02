@@ -183,7 +183,11 @@ unless @pattern_pixels || @pattern_grid
 end
 
 unless @bmp_data
-  @pattern_pixels = @pattern_pixels[32 * @skip_cells..] if @skip_cells
+  if @skip_cells
+    @outname += "+#{@skip_cells}"
+    @pattern_pixels = @pattern_pixels[32 * @skip_cells..]
+  end
+
   @pattern_pixels = @pattern_pixels[...32 * @cell_count] if @cell_count
 
   @pattern_grid ||= generate_grid
