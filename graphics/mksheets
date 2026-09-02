@@ -2,7 +2,27 @@
 
 OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink"
 
+convert -size 1x1 xc:transparent empty.bmp
+
+[ -d tiles/ ] || mkdir tiles
+
+(
+  cd tiles/
+  for n in {0..943}
+  do
+    file="tile-$n.bmp"
+    [ -h "$file" ] && rm "$file"
+
+    if ! [ -f "$file" ]
+    then
+      echo "Extract $file..."
+      ../../gex ../../rings.bin -t "$n" || ln -s ../empty.bmp "$file"
+    fi
+  done
+)
+
+montage $OPTIONS tiles/tile-{0..943}.bmp tiles-all.png
+
 montage $OPTIONS tiles/tile-{{288..447},{592..815},{928..943},{448..463}}.bmp tiles-people.png
 montage $OPTIONS tiles/tile-{{512..559},{816..927}}.bmp tiles-battle.png
 montage $OPTIONS tiles/tile-{{0..287},{464..511},{560..589}}.bmp tiles-terrain.png
-
