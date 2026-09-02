@@ -27,7 +27,7 @@ while param = ARGV.shift
     ARGV.unshift $2 unless $2.empty?
   end
 
-  arg = ARGV.shift.to_i if 'pmtcgisw'.include? param
+  arg = Integer(ARGV.shift) if 'pmtcgiswol'.include? param
 
   case param
   when 'p' # Extract portrait
