@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink"
+OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink -font FreeMono-Bold -pointsize 9 +set label"
 
 convert -size 1x1 xc:transparent empty.bmp
 
@@ -21,8 +21,31 @@ convert -size 1x1 xc:transparent empty.bmp
   done
 )
 
-montage $OPTIONS tiles/tile-{0..943}.bmp tiles-all.png
+[ -f tiles-all.png ] ||
+montage $OPTIONS \
+  label:{0x000,+{1..9},+{a..f}} tiles/tile-{0..255}.bmp \
+  label:{0x100,+{1..9},+{a..f}} tiles/tile-{256..511}.bmp \
+  label:{0x200,+{1..9},+{a..f}} tiles/tile-{512..767}.bmp \
+  label:{0x300,+{1..9},+{a..f}} tiles/tile-{768..943}.bmp \
+  tiles-all.png
 
-montage $OPTIONS tiles/tile-{{288..447},{592..815},{928..943},{448..463}}.bmp tiles-people.png
-montage $OPTIONS tiles/tile-{{512..559},{816..927}}.bmp tiles-battle.png
-montage $OPTIONS tiles/tile-{{0..287},{464..511},{560..589}}.bmp tiles-terrain.png
+[ -f tiles-battle.png ] ||
+montage $OPTIONS \
+  label:{0x200,+{1..9},+{a..f}} tiles/tile-{512..559}.bmp \
+  label:{0x330,+{1..9},+{a..f}} tiles/tile-{816..927}.bmp \
+  tiles-battle.png
+
+[ -f tiles-people.png ] ||
+montage $OPTIONS \
+  label:{0x120,+{1..9},+{a..f}} tiles/tile-{288..447}.bmp \
+  label:{0x1c0,+{1..9},+{a..f}} tiles/tile-{448..463}.bmp \
+  label:{0x250,+{1..9},+{a..f}} tiles/tile-{592..815}.bmp \
+  label:{0x3a0,+{1..9},+{a..f}} tiles/tile-{928..943}.bmp \
+  tiles-people.png
+
+[ -f tiles-terrain.png ] ||
+montage $OPTIONS \
+  label:{0x000,+{1..9},+{a..f}} tiles/tile-{0..287}.bmp \
+  label:{0x1d0,+{1..9},+{a..f}} tiles/tile-{464..511}.bmp \
+  label:{0x230,+{1..9},+{a..f}} tiles/tile-{560..589}.bmp \
+  tiles-terrain.png
