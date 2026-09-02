@@ -65,11 +65,14 @@ while param = ARGV.shift
     @px_high = tile.height
     @bmp_data = tile.pixels
     @palette_number = 10
-    @mask_colour = [0xff, 0, 0xff, 0]
+    @mask_colour = 'ff00ff'
     exit 1 if @bmp_data.empty?
 
     warn "Linear raster #{@px_wide} x #{@px_high}"
 
+  when 'M' # Specify mask colour (HTML notation)
+    @mask_colour = ARGV.shift
+    @mask_colour = @mask_colour[1..] if @mask_colour.start_with? '#'
   when 'c' # Specify palette colours (raw palette)
     @outname ||= "palette-#{arg}"
     @palette_number = arg
@@ -93,7 +96,7 @@ end
 
 def convert_palette
   @sega_palette.map do |c|
-    rgba = [c[8..11], c[4..7], c[0..3], c[12..15]]
+    rgba = [c[0..3], c[4..7], c[8..11], c[12..15]]
     rgba.map { |ch| ch * 0x12 }
   end
 end
@@ -165,10 +168,10 @@ def generate_grid
 end
 
 @sega_palette = ROM[:palettes][@palette_number] if @palette_number
-rgb0_palette = @sega_palette ? convert_palette : default_palette
-rgb0_palette[0] = @mask_colour if @mask_colour
+rgba_palette = @sega_palette ? convert_palette : default_palette
+rgba_palette[0] = [@mask_colour].pack('H*').bytes if @mask_colour
 
-warn "Palette: #{rgb0_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
+warn "Palette: #{rgba_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
 
 # No pixels or grid - palette swatch
 unless @pattern_pixels || @pattern_grid
@@ -192,4 +195,4 @@ end
 dump_histogram
 
 bmp = BMPWriter.new("#{@outname}.bmp")
-bmp.write(@px_wide, @px_high, rgb0_palette, @bmp_data)
+bmp.write(@px_wide, @px_high, rgba_palette, @bmp_data)

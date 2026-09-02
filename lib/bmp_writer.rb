@@ -27,8 +27,13 @@ class BMPWriter
     @f.write [1, 4, 0, 0, 0, 0, 0, 0].pack('vvV*')
   end
 
-  def write_palette(palette)
-    @f.write(palette.flatten.pack('C*'))
+  def write_palette(rgba_palette)
+    bgra_palette = Array.new(16) do |index|
+      r, g, b, a = rgba_palette[index]
+      [b, g, r, a].map { |x| x || 0 }
+    end
+
+    @f.write(bgra_palette.flatten.pack('C*'))
   end
 
   def write_pixel_data(data)
