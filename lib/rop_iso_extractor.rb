@@ -28,14 +28,14 @@ class ROPISOExtractor
 
     return if lines.empty?
 
-    # NB: windows bitmaps must have extra alignment bytes
-    @width = lines.map(&:length).max * 2
-    bytewidth = (@width / 8.0).ceil * 4
-    @pixels = lines.map { |l| l + padding(bytewidth - l.length) }.join
+    bytewidth = lines.map(&:length).max
+    @width = 2 * bytewidth
     @height = lines.length
+
+    @pixels = lines.map { |l| l + padding(bytewidth - l.length) }.join
   end
 
   def padding(n)
-    "\x0" * n
+    "\0" * n
   end
 end

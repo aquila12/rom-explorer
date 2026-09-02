@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'stringio'
+
 # Writer for 16-colour 4bpp bitmaps
 class BMPWriter
   def initialize(filename)
@@ -10,7 +12,9 @@ class BMPWriter
     @f = File.open(@filename, 'wb')
     write_header(width, height)
     write_palette(palette)
-    write_pixel_data(data)
+    @pdata = @f.pos
+    write_pixel_data(data, width)
+    @size = @f.pos
     write_offsets
   ensure
     @f.close
@@ -36,10 +40,16 @@ class BMPWriter
     @f.write(bgra_palette.flatten.pack('C*'))
   end
 
-  def write_pixel_data(data)
-    @pdata = @f.pos
-    @f.write data
-    @size = @f.pos
+  def write_pixel_data(data, width)
+    return @f.write(data) if width % 8 == 0
+
+    io = StringIO.new(data)
+    data_bytes = width / 2
+    padding = "\0" * (4 - data_bytes % 4)
+
+    while(line = io.read(data_bytes)) do
+      @f.write(line + padding)
+    end
   end
 
   def write_offsets
