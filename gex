@@ -4,7 +4,7 @@
 # Rings of Power Graphics Extractor
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 
-require 'gex_cli'
+require 'gex_api'
 require 'bmp_writer'
 
 def error(msg)
