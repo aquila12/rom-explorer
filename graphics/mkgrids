@@ -4,41 +4,44 @@
 
 (
   cd grids/
+
+  GEX='../../gex ../../rings.bin'
+
   # World surround, combat surround
-  ../../gex ../../rings.bin -g9 -i6 -w40 -Mff00ff -c11
-  ../../gex ../../rings.bin -g35 -i34 -w40 -Mff00ff -c30
+  $GEX -g9 -i6 -w40 -Mff00ff -c11
+  $GEX -g35 -i34 -w40 -Mff00ff -c30
 
   # Scroller backdrop - head, body, foot
-  ../../gex ../../rings.bin -g13 -i12 -c12 -w40
-  ../../gex ../../rings.bin -g14 -i12 -c12 -w40
-  ../../gex ../../rings.bin -g15 -i12 -c12 -w40
+  $GEX -g13 -i12 -c12 -w40
+  $GEX -g14 -i12 -c12 -w40
+  $GEX -g15 -i12 -c12 -w40
 
   # Marquee masks - RINGS of POWER, THE END
-  ../../gex ../../rings.bin -g22 -i21 -c11 -Mff00ff -w38
-  ../../gex ../../rings.bin -g23 -i21 -c11 -Mff00ff -w9
-  ../../gex ../../rings.bin -g24 -i21 -c11 -Mff00ff -w8
-  ../../gex ../../rings.bin -g25 -i21 -c11 -Mff00ff -w21
-  ../../gex ../../rings.bin -g26 -i21 -c11 -Mff00ff -w35
+  $GEX -g22 -i21 -c11 -Mff00ff -w38
+  $GEX -g23 -i21 -c11 -Mff00ff -w9
+  $GEX -g24 -i21 -c11 -Mff00ff -w8
+  $GEX -g25 -i21 -c11 -Mff00ff -w21
+  $GEX -g26 -i21 -c11 -Mff00ff -w35
 
-  ../../gex ../../rings.bin -g48 -i21 -c11 -Mff00ff -w38
-  ../../gex ../../rings.bin -g49 -i21 -c11 -Mff00ff -w9
-  ../../gex ../../rings.bin -g50 -i21 -c11 -Mff00ff -w8
-  ../../gex ../../rings.bin -g51 -i21 -c11 -Mff00ff -w21
-  ../../gex ../../rings.bin -g52 -i21 -c11 -Mff00ff -w35
+  $GEX -g48 -i21 -c11 -Mff00ff -w38
+  $GEX -g49 -i21 -c11 -Mff00ff -w9
+  $GEX -g50 -i21 -c11 -Mff00ff -w8
+  $GEX -g51 -i21 -c11 -Mff00ff -w21
+  $GEX -g52 -i21 -c11 -Mff00ff -w35
 
   # Main menu screen - stars, backdrop
-  ../../gex ../../rings.bin -g39 -i37 -c18 -w40
-  ../../gex ../../rings.bin -g40 -i37 -c18 -w40
+  $GEX -g39 -i37 -c18 -w40
+  $GEX -g40 -i37 -c18 -w40
 
   # Ending (Nexus) - layer 1, layer 2
-  ../../gex ../../rings.bin -g43 -i42 -c25 -w36
-  ../../gex ../../rings.bin -g44 -i42 -c25 -w7
+  $GEX -g43 -i42 -c25 -w36
+  $GEX -g44 -i42 -c25 -w7
 
   # Ending (Castle close-up)
-  ../../gex ../../rings.bin -g54 -i53 -c17 -w40
+  $GEX -g54 -i53 -c17 -w40
 
   # Ending (Castle) - outside
-  ../../gex ../../rings.bin -g57 -i56 -c27 -Mff00ff -w27
+  $GEX -g57 -i56 -c27 -Mff00ff -w27
 )
 
 OPTIONS="-geometry +0+0 -tile x1 -gravity center -background black"
