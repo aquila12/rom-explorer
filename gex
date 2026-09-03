@@ -7,23 +7,77 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 require 'gex_cli'
 require 'bmp_writer'
 
-gex = GexCLI.new
-
-warn "Palette: #{gex.rgba_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
-
-if gex.cell_dimensions
-  warn "Grid size: #{gex.pattern_grid.length} entries"
-  warn "Geometry: #{gex.cell_dimensions.join(' x ')} cells"
+def error(msg)
+  warn "Error: #{msg}"
+  exit 1
 end
 
-warn "Output dimensions: #{gex.dimensions.join(' x ')} pixels"
+def handle_option(param)
+  case param
+  when 'p' then GEX.extract_portrait(Integer(arg))
+  when 'm' then GEX.extract_map(Integer(arg))
+  when 't' then GEX.extract_tile(Integer(arg))
+  when 'd' then GEX.extract_dumped_ram(arg)
+  when 'M' then GEX.specify_mask_colour(arg)
+  when 'c' then GEX.specify_colour_palette(Integer(arg))
+  when 'g' then GEX.specify_grid_resource(Integer(arg))
+  when 'i' then GEX.specify_image_pixels(Integer(arg))
+  when 's' then GEX.sprite_h = Integer(arg)
+  when 'w' then GEX.cells_wide = Integer(arg)
+  when 'o' then GEX.skip_cells = Integer(arg)
+  when 'l' then GEX.cell_count = Integer(arg)
+  else
+    error "Unknown parameter: -#{param}"
+  end
+end
 
-gex.histogram.sort.each { |i, v| warn format('%2d: %d entries', i, v) }
-warn "#{gex.histogram.count} used colours"
-warn "#{gex.histogram.values.sum} pixels"
+def parse_options!
+  while param = ARGV.shift
+    if param =~ /^-(\w)(.*)/
+      param = $1
+      ARGV.unshift $2 unless $2.empty?
+    else
+      error "Error: unexpected parameter: #{param}"
+    end
 
-filename = "#{gex.outname}.bmp"
+    handle_option(param)
+  end
+end
+
+def arg(name = 'Argument')
+  error "#{name} required" if ARGV.empty?
+
+  ARGV.shift
+end
+
+romfile = arg('ROM filename')
+ROM = RingsOfPower.apply_to(File.binread(romfile))
+GEX = GexAPI.new(rom: ROM)
+
+while param = ARGV.shift
+  if param =~ /^-(\w)(.*)/
+    ARGV.unshift $2 unless $2.empty?
+	handle_option($1)
+  else
+    error "Unexpected parameter: #{param}"
+  end
+end
+
+warn "Palette: #{GEX.rgba_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
+
+if GEX.cell_dimensions
+  warn "Grid size: #{GEX.pattern_grid.length} entries"
+  warn "Geometry: #{GEX.cell_dimensions.join(' x ')} cells"
+end
+
+warn "Output dimensions: #{GEX.dimensions.join(' x ')} pixels"
+
+GEX.histogram.sort.each { |i, v| warn format('%2d: %d entries', i, v) }
+warn "#{GEX.histogram.count} used colours"
+warn "#{GEX.histogram.values.sum} pixels"
+
+filename = "#{GEX.outname}.bmp"
 bmp = BMPWriter.new(filename)
-bmp.write(*gex.dimensions, gex.rgba_palette, gex.bmp_data)
+bmp.write(*GEX.dimensions, GEX.rgba_palette, GEX.bmp_data)
 
 warn "Output: #{filename}"

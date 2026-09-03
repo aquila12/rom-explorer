@@ -6,40 +6,11 @@ require 'rop_iso_extractor'
 require_relative '../romlayout'
 
 # Rings of Power Graphics Extractor CLI
-class GexCLI < Gex
-  def initialize
-    romfile = ARGV.shift
-    warn 'No ROM specified' unless romfile
-    @rom = RingsOfPower.apply_to(File.binread(romfile))
-
-    super(rom: @rom)
-
-    parse_options!
-    @outname += "+#{@skip_cells}" if @skip_cells
-  end
-
-  def handle_option(param)
-    case param
-    when 'p' then extract_portrait(Integer(arg))
-    when 'm' then extract_map(Integer(arg))
-    when 't' then extract_tile(Integer(arg))
-    when 'd' then extract_dumped_ram(arg)
-    when 'M' then specify_mask_colour(arg)
-    when 'c' then specify_colour_palette(Integer(arg))
-    when 'g' then specify_grid_resource(Integer(arg))
-    when 'i' then specify_image_pixels(Integer(arg))
-    when 's' then @sprite_h = Integer(arg)
-    when 'w' then @cells_wide = Integer(arg)
-    when 'o' then @skip_cells = Integer(arg)
-    when 'l' then @cell_count = Integer(arg)
-    else
-      warn "Error: Unknown parameter: -#{param}"
-      exit 1
-    end
-  end
-
-  attr_reader :outname
+class GexAPI < Gex
   attr_accessor :sprite_h, :cells_wide, :skip_cells, :cell_count
+  def outname
+    @skip_cells ? @outname + @skip_cells : @outname
+  end
 
   def extract_portrait(id)
     @outname = "portrait-#{id}"
@@ -118,29 +89,6 @@ class GexCLI < Gex
       next nil if entry.zero? unless tile < 4
 
       [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
-    end
-  end
-
-  def parse_options!
-    while param = ARGV.shift
-      if param =~ /^-(\w)(.*)/
-        param = $1
-        ARGV.unshift $2 unless $2.empty?
-      else
-        warn "Error: unexpected parameter: #{param}"
-        exit 1
-      end
-
-      handle_option(param)
-    end
-  end
-
-  def arg
-    ARGV.shift.tap do |a|
-      next if a
-
-      warn "Argument required"
-      exit 1
     end
   end
 
