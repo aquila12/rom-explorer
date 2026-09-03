@@ -1,0 +1,51 @@
+#!/bin/bash
+
+convert -size 1x1 xc:transparent empty.bmp
+
+[ -d tiles/ ] || mkdir tiles
+
+(
+  cd tiles/
+  for n in {0..943}
+  do
+    file="tile-$n.bmp"
+    [ -h "$file" ] && rm "$file"
+
+    if ! [ -f "$file" ]
+    then
+      echo "Extract $file..."
+      ../../gex ../../rings.bin -t "$n" || ln -s ../empty.bmp "$file"
+    fi
+  done
+)
+
+OPTIONS="-border 0 -tile 16x -geometry +1+1 -extent 30x -gravity northwest -background pink -font FreeMono-Bold -pointsize 9 +set label"
+
+[ -f tiles-all.png ] ||
+montage $OPTIONS \
+  label:{0x000,+{1..9},+{a..f}} tiles/tile-{0..255}.bmp \
+  label:{0x100,+{1..9},+{a..f}} tiles/tile-{256..511}.bmp \
+  label:{0x200,+{1..9},+{a..f}} tiles/tile-{512..767}.bmp \
+  label:{0x300,+{1..9},+{a..f}} tiles/tile-{768..943}.bmp \
+  tiles-all.png
+
+[ -f tiles-battle.png ] ||
+montage $OPTIONS \
+  label:{0x200,+{1..9},+{a..f}} tiles/tile-{512..559}.bmp \
+  label:{0x330,+{1..9},+{a..f}} tiles/tile-{816..927}.bmp \
+  tiles-battle.png
+
+[ -f tiles-people.png ] ||
+montage $OPTIONS \
+  label:{0x120,+{1..9},+{a..f}} tiles/tile-{288..447}.bmp \
+  label:{0x1c0,+{1..9},+{a..f}} tiles/tile-{448..463}.bmp \
+  label:{0x250,+{1..9},+{a..f}} tiles/tile-{592..815}.bmp \
+  label:{0x3a0,+{1..9},+{a..f}} tiles/tile-{928..943}.bmp \
+  tiles-people.png
+
+[ -f tiles-terrain.png ] ||
+montage $OPTIONS \
+  label:{0x000,+{1..9},+{a..f}} tiles/tile-{0..287}.bmp \
+  label:{0x1d0,+{1..9},+{a..f}} tiles/tile-{464..511}.bmp \
+  label:{0x230,+{1..9},+{a..f}} tiles/tile-{560..589}.bmp \
+  tiles-terrain.png
