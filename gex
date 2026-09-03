@@ -2,213 +2,28 @@
 # frozen_string_literal: true
 
 # Rings of Power Graphics Extractor
-
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 
-require 'layoutable'
+require 'gex_cli'
 require 'bmp_writer'
-require 'rop_iso_extractor'
-require_relative 'romlayout'
 
-romfile = ARGV.shift
-warn 'No ROM specified' unless romfile
-ROM = RingsOfPower.apply_to(File.binread(romfile))
+gex = GexCLI.new
 
-def lzss_load(directory, files, index)
-  entry = ROM[directory][index]
+warn "Palette: #{gex.rgba_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
 
-  warn "#{directory}[#{index}] is type #{type} - this could go un-well!" unless entry[:type] == 1
-  ROM[files][entry[:offset]]
+if gex.cell_dimensions
+  warn "Grid size: #{gex.pattern_grid.length} entries"
+  warn "Geometry: #{gex.cell_dimensions.join(' x ')} cells"
 end
 
-while param = ARGV.shift
-  if param =~ /^-(\w)(.*)/
-    param = $1
-    ARGV.unshift $2 unless $2.empty?
-  end
+warn "Output dimensions: #{gex.dimensions.join(' x ')} pixels"
 
-  arg = Integer(ARGV.shift) if 'pmtcgiswol'.include? param
+gex.histogram.sort.each { |i, v| warn format('%2d: %d entries', i, v) }
+warn "#{gex.histogram.count} used colours"
+warn "#{gex.histogram.values.sum} pixels"
 
-  case param
-  when 'p' # Extract portrait
-    @outname = "portrait-#{arg}"
-    file = lzss_load(:portrait_directory, :portrait_files, arg)
+filename = "#{gex.outname}.bmp"
+bmp = BMPWriter.new(filename)
+bmp.write(*gex.dimensions, gex.rgba_palette, gex.bmp_data)
 
-    @sega_palette = file.values_at(*(0..15).to_a)
-    @pattern_pixels = file[:pixels]
-    @cells_wide = 6
-
-  when 'm' # Extract map
-    @outname = "map-#{arg}"
-    @pattern_pixels = lzss_load(:lzss_directory, :lzss_files, 10)
-    @palette_number = 10
-    @cells_wide = arg < 77 || arg >= 230 ? 32 : 11
-
-    lookup = ROM[:ingame_map_lookup].load_all
-    map_grid = lzss_load(:map_directory, :map_files, arg)
-    @pattern_grid = map_grid.map do |t|
-      tile = t[0..8]
-      version = t[12].zero? ? :normal : :mirror
-      entry = lookup[tile][version]
-
-      # Frob to avoid the sentinel data when attempting to render non-world maps
-      next nil if entry.zero? unless tile < 4
-
-      [entry[2..], entry[0].nonzero?, entry[1].nonzero? ]
-    end
-
-  when 't' # Extract isometric tile
-    @outname = "tile-#{arg}"
-    start = ROM[:isotile_index][arg]
-    tile = ROPISOExtractor.new(ROM[:isotile_data][start])
-    @px_wide = tile.width
-    @px_high = tile.height
-    @bmp_data = tile.pixels
-    @palette_number = 10
-    @mask_colour = 'ff00ff'
-    exit 1 if @bmp_data.empty?
-
-    warn "Linear raster #{@px_wide} x #{@px_high}"
-
-  when 'd' # Extract dumped RAM
-    dump = ARGV.shift
-    @pattern_pixels = File.binread(dump)
-    @outname = dump.sub(/\.[^.]*$/, '')
-
-  when 'M' # Specify mask colour (HTML notation)
-    @mask_colour = ARGV.shift
-    @mask_colour = @mask_colour[1..] if @mask_colour.start_with? '#'
-  when 'c' # Specify palette colours (raw palette)
-    @outname ||= "palette-#{arg}"
-    @palette_number = arg
-  when 'g' # Specify pattern grid (LZSS resource)
-    @outname ||= "grid-#{arg}"
-    @pattern_grid = lzss_load(:lzss_directory, :lzss_files, arg).unpack('n*').map do |e|
-      [e[0..10], e[11].nonzero?, e[12].nonzero?]
-    end
-  when 'i' # Specify pattern image pixels
-    @outname ||= "patterns-#{arg}"
-    @pattern_pixels = lzss_load(:lzss_directory, :lzss_files, arg)
-  when 's' # Specify sprite division mode (sprite height in cells)
-    @sprite_h = arg
-  when 'w' # Specify output width (in cells)
-    @cells_wide = arg
-  when 'o' # Specify data offset (in cells) - drops image pixels
-    @skip_cells = arg
-  when 'l' # Specify data length (in cells) - drops image pixels
-    @cell_count = arg
-  else
-    warn "Unknown parameter -#{param}"
-    exit 1
-  end
-end
-
-def convert_palette
-  @sega_palette.map do |c|
-    rgba = [c[0..3], c[4..7], c[8..11], c[12..15]]
-    rgba.map { |ch| ch * 0x12 }
-  end
-end
-
-def default_palette
-  bright = [0x00, 0x66]
-  value = [0x00, 0x99]
-  Array.new(16) { |n|
-    i = bright[n[3]]
-    [i + value[n[0]], i + value[n[1]], i + value[n[2]], 0]
-  }
-end
-
-def calibrate_grid!
-  # Default to making a squareish dump image
-  @total_cells ||= @pattern_grid.length
-  @cells_wide ||= (@total_cells ** 0.5).floor
-
-  d, m = @total_cells.divmod(@cells_wide)
-  @cells_high = m.zero? ? d : d + 1
-  @pattern_grid += [nil] * m if @pattern_grid
-end
-
-def restripe_data
-  cells = @pattern_grid.each_slice(@cells_wide).to_a
-  lines = @pattern_pixels.unpack('V*')
-  patterns = lines.each_slice(8).to_a
-  reverses = lines.map { |p| format('%08x', p).reverse.to_i(16) }.each_slice(8).to_a
-
-  (8 * @cells_high).times.flat_map do |y|
-    row, line = y.divmod(8)
-    Array.new(@cells_wide) do |col|
-      p, hf, vf = cells[row][col]
-      next 0 unless p
-
-      pat = hf ? reverses[p] : patterns[p]
-      l = vf ? 7 - line : line
-
-      pat ? pat[l] : 0
-    end
-  end.pack('V*')
-end
-
-def dump_histogram
-  histogram = @bmp_data.unpack1('H*').chars.tally
-  histogram.sort.each do |k, v|
-    i = k.to_i(16)
-    warn format('%<index>2d: %<count>d entries', index: i, count: v)
-  end
-
-  warn "#{histogram.count} used colours"
-  warn "#{histogram.values.sum} pixels"
-end
-
-def generate_grid
-  @sprite_h ||= 1
-  @total_cells = @pattern_pixels.length / 32
-  return Array.new(@total_cells, &:itself) if @sprite_h == 1
-
-  calibrate_grid!
-
-  section = @cells_wide * @sprite_h
-  Array.new(@total_cells) do |n|
-    s, q = n.divmod(section)
-    r, c = q.divmod(@cells_wide)
-
-    s * section + c * @sprite_h + r
-  end
-end
-
-@sega_palette = ROM[:palettes][@palette_number] if @palette_number
-rgba_palette = @sega_palette ? convert_palette : default_palette
-rgba_palette[0] = [@mask_colour].pack('H*').bytes if @mask_colour
-
-warn "Palette: #{rgba_palette.map { |e| format('%02x%02x%02x', *e) }.join(' ')}"
-
-# No pixels or grid - palette swatch
-unless @pattern_pixels || @pattern_grid
-  @pattern_pixels = 16.times.flat_map { |n| [n * 0x11111111] * 8 }.pack('V*')
-end
-
-unless @bmp_data
-  if @skip_cells
-    @outname += "+#{@skip_cells}"
-    @pattern_pixels = @pattern_pixels[32 * @skip_cells..]
-  end
-
-  @pattern_pixels = @pattern_pixels[...32 * @cell_count] if @cell_count
-
-  @pattern_grid ||= generate_grid
-  # @pattern_pixels ||= TODO
-
-  warn "Grid size: #{@pattern_grid.length} entries"
-
-  calibrate_grid!
-  warn "Geometry: #{@cells_wide} x #{@cells_high} cells"
-
-  @bmp_data = restripe_data
-end
-
-@px_wide ||= @cells_wide * 8
-@px_high ||= @cells_high * 8
-dump_histogram
-
-bmp = BMPWriter.new("#{@outname}.bmp")
-bmp.write(@px_wide, @px_high, rgba_palette, @bmp_data)
+warn "Output: #{filename}"
