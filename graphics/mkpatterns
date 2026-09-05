@@ -1,0 +1,69 @@
+#!/bin/bash
+
+[ -d patterns/ ] || mkdir patterns
+
+(
+  cd patterns/
+
+  GEX='../../gex ../../rings.bin'
+
+  # Font, bar charts
+  $GEX -i0 -c2
+  $GEX -i1 -c30 -w5
+
+  # Naughty dog - dog (flipped), palms, sunset, logo, woman (clothed and naked)
+  $GEX -i2 -c1 -w12 -s4
+  $GEX -i3 -c3 -w8
+  $GEX -i4 -c2 -w1
+  $GEX -i5 -c6 -w28 -s3
+
+  $GEX -i7 -c7 -w16 -s4
+  $GEX -i8 -c7 -w12 -s4
+
+  # In-game map: tiles, top/bottom border, left/right border
+  $GEX -i10 -c10
+  $GEX -i33 -c12 -w40 -l240
+  $GEX -i33 -c12 -w4 -o240
+
+  # Dialogue parchment
+  $GEX -i11 -c11 -w4 -s4 -M00fc00
+
+  # Help icons: controller, labels, arrow
+  $GEX -i16 -c30 -w16 -s4
+  $GEX -i17 -c30 -l44 -w4
+  $GEX -i17 -c30 -o44 -l4 -w2 -s2
+
+  # Battle party labels
+  $GEX -i17 -c30 -o48 -l24 -w6 -s2
+
+  # Compass points
+  $GEX -i17 -c30 -o72 -w4
+
+  # Title screen - bottom bar, font, game logo, buc, hand, ring
+  $GEX -i18 -c13 -w40
+  $GEX -i19 -c13
+  $GEX -i20 -c13 -w21
+
+  $GEX -i29 -c14 -w14 -s4
+  $GEX -i30 -c14 -w4 -s4
+  $GEX -i31 -c14 -w4 -s4
+
+  # Marquee background - sky, mountains
+  $GEX -i27 -c15 -w4
+  $GEX -i28 -c16 -w32
+
+  # In-game map border - top/bottom, left/right
+  $GEX -i33 -c12 -w40 -l240
+  $GEX -i33 -c12 -w4 -o240
+
+  # Scrolltext font
+  $GEX -i36 -c2 -w135 -s2
+
+  # The Adventure Begins
+  $GEX -i38 -c13 -w33
+
+  # Ending - planet, Buc, Buc (close-up)
+  $GEX -i41 -c25 -w12 -s4
+  $GEX -i46 -c14 -w16 -s4
+  $GEX -i60 -c14 -w12 -s4 # Needs manual alignment
+)
