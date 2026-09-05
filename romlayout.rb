@@ -49,6 +49,8 @@ class RingsOfPower
     at 0x1b2e0, *data
     at 0x1b320, :text_title_scroller, Table, 42, 'a*'
     at 0x1b446, *data
+    at 0x1b4ee, :gomez_maze_table, Table, 4, Struct, 'cccc', :mound_lon, :mound_lat, :stump_lon, :stump_lat
+    at 0x1b50e, *data
 
     at 0x1b5d6, *code
     at 0x29370, *data, note: 'Constants?'
