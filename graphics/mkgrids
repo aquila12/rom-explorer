@@ -44,7 +44,7 @@
   $GEX -g57 -i56 -c27 -Mff00ff -w27
 )
 
-OPTIONS="-geometry +0+0 -tile x1 -gravity center -background black"
+OPTIONS="-tile x1 -gravity center -background pink"
 
-montage $OPTIONS grids/grid-{22..26}.bmp marquee-rings.png
-montage $OPTIONS grids/grid-{48..52}.bmp marquee-end.png
+montage -geometry +8+0 $OPTIONS grids/grid-{22..26}.bmp marquee-rings.png
+montage -geometry +0+0 $OPTIONS grids/grid-{48..52}.bmp marquee-end.png
