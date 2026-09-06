@@ -28,6 +28,7 @@ montage $OPTIONS portraits/portrait-{34,79}.bmp portraits-7.bmp
 
 OPTIONS="-border 0 -tile 1x -geometry +1+1 -gravity south -background pink -font FreeSans -pointsize 12 +set label -transparent #ff00ff"
 
+[ -f portraits.png ] ||
 montage $OPTIONS \
   label:"Buc's party" portraits-1.bmp \
   label:"General NPCs" portraits-2.bmp \
