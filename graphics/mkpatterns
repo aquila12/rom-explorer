@@ -78,5 +78,8 @@
   # Ending - castle flags, buc dropping, fireworks
   $GEX -i58 -c27 -M800080 -w3 -s2 -o0 -l24
   $GEX -i58 -c27 -M800080 -w3 -s3 -o24 -l9
-  $GEX -i58 -c27 -M800080 -w4 -s4 -o33
+  $GEX -i58 -c28 -M800080 -w4 -s4 -o33
+  mv patterns-58+33.bmp patterns-58+33c28.bmp
+  $GEX -i58 -c29 -M800080 -w4 -s4 -o33
+  mv patterns-58+33.bmp patterns-58+33c29.bmp
 )
