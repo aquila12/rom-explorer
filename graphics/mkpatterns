@@ -65,5 +65,5 @@
   # Ending - planet, Buc, Buc (close-up)
   $GEX -i41 -c25 -w12 -s4
   $GEX -i46 -c14 -w16 -s4
-  $GEX -i60 -c14 -w12 -s4 # Needs manual alignment
+  $GEX -i60 -c14 -w4 -s4 # Needs manual alignment
 )
