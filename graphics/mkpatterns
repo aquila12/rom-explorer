@@ -12,13 +12,13 @@
   $GEX -i1 -c30 -w5
 
   # Naughty dog - dog (flipped), palms, sunset, logo, woman (clothed and naked)
-  $GEX -i2 -c1 -w12 -s4
+  $GEX -i2 -c1 -Mff00ff -w12 -s4
   $GEX -i3 -c3 -w8
   $GEX -i4 -c2 -w1
   $GEX -i5 -c6 -w28 -s3
 
-  $GEX -i7 -c7 -w16 -s4
-  $GEX -i8 -c7 -w12 -s4
+  $GEX -i7 -c7 -Mff00ff -w16 -s4
+  $GEX -i8 -c7 -Mff00ff -w12 -s4
 
   # In-game map: tiles, top/bottom border, left/right border
   $GEX -i10 -c10
