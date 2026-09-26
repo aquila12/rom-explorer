@@ -34,8 +34,8 @@
   $GEX -g40 -i37 -c18 -w40
 
   # Ending (Nexus) - layer 1, layer 2
-  $GEX -g43 -i42 -c25 -w36
-  $GEX -g44 -i42 -c25 -w7
+  $GEX -g43 -i42 -c25 -w32
+  $GEX -g44 -i42 -c25 -w8
 
   # Ending (Castle close-up)
   $GEX -g54 -i53 -c17 -w40
