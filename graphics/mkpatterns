@@ -74,4 +74,9 @@
   $GEX -i45 -c26 -w1 -s12 -o0 -l12
   $GEX -i45 -c26 -w8 -s1  -o12 -l8
   $GEX -i45 -c26 -w4 -s2  -o20
+
+  # Ending - castle flags, buc dropping, fireworks
+  $GEX -i58 -c27 -M800080 -w3 -s2 -o0 -l24
+  $GEX -i58 -c27 -M800080 -w3 -s3 -o24 -l9
+  $GEX -i58 -c27 -M800080 -w4 -s4 -o33
 )
