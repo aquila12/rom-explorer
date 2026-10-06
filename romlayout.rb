@@ -87,7 +87,7 @@ class RingsOfPower
     at 0xcecf0, *data
 
     at 0xcf1ac, *table, 24, 'a*'
-    at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :unk1, :unk2, :unk3, :unk4, :long, :lat, :floor, :type
+    at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :equivalent_location, :city, :unk3, :unk4, :long, :lat, :floor, :type
 
     at 0xd2ec2, *table, 12, 'a*'
     at 0xd301e, *table, 6, 'a*'
