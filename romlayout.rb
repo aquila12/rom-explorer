@@ -90,7 +90,7 @@ class RingsOfPower
     at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :equivalent_location, :city, :unk3, :unk4, :long, :lat, :floor, :type
 
     at 0xd2ec2, *table, 12, 'a*'
-    at 0xd301e, *table, 6, 'a*'
+    at 0xd301e, :sign_positions, Table, 6,'nna*', :lon, :lat, :unused
     at 0xd3102, *table, 12, 'a*'
     at 0xd601e, :lockables_table, Table, 6, 'nncc', :flags1, :flags2, :local_lon, :local_lat, note: 'Matches quest flag index'
     at 0xd63e4, :locations_something, Table, 4, 'c*', note: 'Indexed by location ID'
