@@ -86,7 +86,7 @@ class RingsOfPower
     at 0xcd430, :menu_words, Table, 16, 'CZ*', :flags, :name, note: 'Also includes character names'
     at 0xcecf0, *data
 
-    at 0xcf1ac, :party_init_table, Table, 24, 'n6nCCnCCnCC', :u1, :city, :time, :u2, :mood, :loyalty, :u3, :floor_loc, :u4, :u5
+    at 0xcf1ac, :party_init_table, Table, 24, 'n6nCCnCCnCC', *(0..5).to_a, :city, :time, :u2, :mood, :loyalty, :u3, :floor_loc, :u4, :u5
     at 0xd1cfc, :locations_table, Table, 10, 'CCCCnnCC', :equivalent_location, :city, :unk3, :unk4, :long, :lat, :floor, :type
 
     at 0xd2ec2, *table, 12, 'a*'
