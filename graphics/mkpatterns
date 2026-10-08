@@ -45,7 +45,8 @@
   $GEX -i20 -c13 -w21
 
   $GEX -i29 -c14 -w14 -s4
-  $GEX -i30 -c14 -w4 -s4
+  $GEX -i30 -c14 -w3 -s4 -o0 -l12
+  $GEX -i30 -c14 -w2 -o12 -l2
   $GEX -i31 -c14 -w4 -s4
 
   # Marquee background - sky, mountains
