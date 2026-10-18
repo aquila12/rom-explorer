@@ -46,7 +46,8 @@ class RingsOfPower
     at 0x1ade4, *data
     at 0x1ae98, :ingame_map_lookup, Table, 2, Struct, 'cc', :mirror, :normal, note: 'Indexes textures somehow'
     at 0x1b298, :city_goods, Table, 2, 'cc', :export, :import, note: 'Half or double price'
-    at 0x1b2e0, *data
+    at 0x1b2e0, :gate_locations, Table, 4, 'nn', :lon, :lat, note: 'Centres of the gates'
+    at 0x1b300, :gate_deltas, Table, 4, 's>s>', :dlon, :dlat, note: 'Relative position of 8 squares around a centre'
     at 0x1b320, :text_title_scroller, Table, 42, 'a*'
     at 0x1b446, *data
     at 0x1b4d2, :parallax_table, Table, 1, 'c*', :x_offset
