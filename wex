@@ -42,6 +42,10 @@ when nil
   puts(OFFSETS.map { |r| ROM[:dictionary][r] })
 when '-w'
   puts word(ARGV.shift.to_i)
+when '--dictionary'
+  OFFSETS.each_with_index do |range, i|
+    puts "#{i}\t#{ROM[:dictionary][range]}"
+  end
 when '-d'
   wvector = [ARGV.shift].pack('H*').unpack('n*')
   words = wvector.map(&method(:word))
