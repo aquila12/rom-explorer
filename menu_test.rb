@@ -139,6 +139,7 @@ def time(name, count)
 end
 
 File.open('rings.bin', 'rb') do |f|
+  f.read
   a1 = time(:ref, 100) { reference_implementation(f) }
   a2 = time(:imp, 100) { implementation(f) }
 
