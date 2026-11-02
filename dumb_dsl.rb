@@ -92,10 +92,9 @@ def array(inner)
   end
 end
 
-def bytes
+def bytes(length = nil)
   proc do |f|
-    length = @upper[f.pos] - f.pos
-    f.read(length)
+    f.read(length || (@upper[f.pos] - f.pos))
   end
 end
 
