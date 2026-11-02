@@ -1,3 +1,5 @@
+require 'yaml'
+
 ZEROBLOCK = ("\0" * 1024).freeze
 
 def sizeof(format)
@@ -86,7 +88,24 @@ def array(inner)
 end
 
 def layout(filename = nil, &block)
-  @layout = filename ? proc { File.open(filename, 'rb', &block) } : block
+  @layout = block
+  return unless filename
+
+  basename = filename.sub(/\.[^\.]+$/, '')
+  outfile = "#{basename}.yaml"
+
+  data = File.open(filename, 'rb') { |f| unmake(f) }
+  yaml = YAML.safe_dump(data, stringify_names: true)
+
+  if File.exist? outfile
+    content = File.read(outfile)
+    if content == yaml
+      warn "Output is the same; skipping write"
+      return
+    end
+  end
+
+  File.write(outfile, yaml)
 end
 
 def unmake(f)
