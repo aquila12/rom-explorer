@@ -32,7 +32,7 @@ def reference_implementation(f)
     )
   end
 
-  { menu_definitions:, quest_descriptor_table: }
+  { lut_nibbleswap: f.pread(256, 0x434c0).unpack('C256'), menu_definitions:, quest_descriptor_table: }
 end
 
 def struct(size, format, names, *bitfields, **postprocessing)
@@ -43,6 +43,14 @@ def struct(size, format, names, *bitfields, **postprocessing)
       after.each { |name, p| struct[name] = p.call(f, struct) }
     end
   end
+end
+
+def array_raw(size, format)
+  proc { |f| f.read(size).unpack(format) }
+end
+
+def value_raw(size, format)
+  proc { |f| f.read(size).unpack1(format) }
 end
 
 def array_n(size, inner)
@@ -99,24 +107,45 @@ def bitfields(bitfield, total_size = 0, **info)
   end
 end
 
-def implementation(f)
-  f.seek(0xccdb8)
-  menu_definitions = array_u(
-    0xcd430, struct(
+def at(addr, **what)
+  @regions[addr] = what
+end
+
+def array(...)
+  proc do |f|
+    array_u(@upper[f.pos], ...).call(f)
+  end
+end
+
+def layout
+  at 0xccdb8, menu_definitions: array(
+    struct(
       12, 'Z6C6', %i[text _f1 _f2 _f3 _f4 type n_entries],
       entries: array_n(:n_entries, struct(14, 'Z6C8', %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type]))
-    )
-  ).call(f, nil)
+    ))
+  at 0xcd430
 
-  f.seek(0xd601e)
-  quest_descriptor_table = array_u(
-    0xd63e4, struct(
+  at 0xd601e, quest_descriptor_table: array(
+    struct(
       6, 'nN', %i[bf1 filter],
       bitfields(:bf1, 16, initial_state: :b, type: 4, item_list: 5, item_index: 6)
     )
-  ).call(f, nil)
+  )
+  at 0xd63e4
 
-  { menu_definitions:, quest_descriptor_table: }
+  at 0x434c0, lut_nibbleswap: array_raw(256, 'C256')
+end
+
+def implementation(f)
+  @regions = {}
+  layout
+  starts = @regions.keys.sort
+  @upper = (starts + [f.size]).each_cons(2).to_h
+
+  starts.map do |start|
+    f.seek(start)
+    @regions[start].transform_values { |p| p.call(f) }
+  end.inject(:merge)
 end
 
 # Strict testing of hash equality: order matters
