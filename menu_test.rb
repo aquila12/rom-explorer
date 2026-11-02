@@ -126,18 +126,21 @@ module KeyOrderSensitivity
 end
 
 @timing = {}
-def time(name)
+def time(name, count)
   t0 = Time.now
-  r = yield
+  n = 0
+  while(n < count)
+    r = yield
+    n += 1
+  end
   t1 = Time.now
-  @timing[name] = t1 - t0
+  @timing[name] = (t1 - t0) / count
   r
 end
 
 File.open('rings.bin', 'rb') do |f|
-  a1 = time(:ref) { reference_implementation(f) }
-  f.seek(0)
-  a2 = time(:imp) { implementation(f) }
+  a1 = time(:ref, 100) { reference_implementation(f) }
+  a2 = time(:imp, 100) { implementation(f) }
 
   puts YAML.safe_dump(a2, stringify_names: true)
 
@@ -145,4 +148,5 @@ File.open('rings.bin', 'rb') do |f|
   warn a1 == a2 ? "PASS" : "FAIL"
 
   warn YAML.safe_dump(@timing, stringify_names: true)
+  warn (@timing[:imp] / @timing[:ref])
 end
