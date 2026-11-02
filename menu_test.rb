@@ -35,7 +35,8 @@ def reference_implementation(f)
   { menu_definitions:, quest_descriptor_table: }
 end
 
-def struct(size, format, names, **after)
+def struct(size, format, names, *bitfields, **postprocessing)
+  after = [*bitfields, postprocessing].inject(:merge)
   proc do |f, parent|
     values = f.read(size).unpack(format)
     names.zip(values).to_h.tap do |struct|
@@ -102,7 +103,7 @@ def implementation(f)
   quest_descriptor_table = array_u(
     0xd63e4, struct(
       6, 'nN', %i[bf1 filter],
-      **bitfields(:bf1, 16, initial_state: {b:1}, type: 4, item_list: 5, item_index: 6)
+      bitfields(:bf1, 16, initial_state: {b:1}, type: 4, item_list: 5, item_index: 6)
     )
   ).call(f, nil)
 
