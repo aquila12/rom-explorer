@@ -173,10 +173,11 @@ File.open('rings.bin', 'rb') do |f|
   a1 = time(:ref, 100) { reference_implementation(f) }
   a2 = time(:imp, 100) { implementation(f) }
 
-  puts YAML.safe_dump(a2, stringify_names: true)
-
   Hash.prepend KeyOrderSensitivity
   warn a1 == a2 ? "PASS" : "FAIL"
+
+  File.write('ref.yaml', YAML.safe_dump(a1, stringify_names: true))
+  File.write('imp.yaml', YAML.safe_dump(a2, stringify_names: true))
 
   warn YAML.safe_dump(@timing, stringify_names: true)
   warn (@timing[:imp] / @timing[:ref])
