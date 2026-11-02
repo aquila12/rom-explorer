@@ -69,7 +69,12 @@ def bitfields(bitfield, total_size = 0, **info)
   end
 end
 
-def at(addr, **what)
+def at(addr, anon = nil, spec = nil, **what)
+  if anon
+    name = "#{anon.to_s}_%05x" % addr
+    what = { name: spec || bytes }
+  end
+
   @regions[addr] = what
 end
 
