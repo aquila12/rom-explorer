@@ -62,6 +62,7 @@ def array_u(upper, inner)
     while f.pos < upper
       arr << inner.call(f, arr)
     end
+    arr.pop if f.pos > upper
     arr
   end
 end
