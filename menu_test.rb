@@ -78,14 +78,15 @@ def bit(bitfield, bits, type = :u)
   end
 end
 
-def bitfields(bitfield, **info)
-  pos = 0
-  info.reverse_each.to_h.transform_values do |spec|
+def bitfields(bitfield, total_size = 0, **info)
+  pos = total_size
+  rev = total_size.positive?
+  info.transform_values do |spec|
     type, size = spec.is_a?(Hash) ? spec.first : [:u, spec]
-    start = pos
-    pos += size
-    bit(bitfield, start...pos, type)
-  end.reverse_each.to_h
+    bits =  rev ? (pos - size)...pos : pos...(pos + size)
+    pos += rev ? -size : size
+    bit(bitfield, bits, type)
+  end
 end
 
 def implementation(f)
@@ -101,7 +102,7 @@ def implementation(f)
   quest_descriptor_table = array_u(
     0xd63e4, struct(
       6, 'nN', %i[bf1 filter],
-      **bitfields(:bf1, initial_state: {b:1}, type: 4, item_list: 5, item_index: 6)
+      **bitfields(:bf1, 16, initial_state: {b:1}, type: 4, item_list: 5, item_index: 6)
     )
   ).call(f, nil)
 
