@@ -65,18 +65,6 @@ def array_n(size, inner)
   end
 end
 
-def array_u(upper, inner)
-  raise ArgumentError, "no block given" unless inner.respond_to?(:call)
-
-  proc do |f|
-    arr = []
-    while f.pos < upper
-      arr << inner.call(f, arr)
-    end
-    arr.pop if f.pos > upper
-    arr
-  end
-end
 
 def bit(bitfield, bits, type = :u)
   proc do |f, parent|
@@ -114,9 +102,17 @@ def at(addr, **what)
   @regions[addr] = what
 end
 
-def array(...)
+def array(inner)
+  raise ArgumentError, "no block given" unless inner.respond_to?(:call)
+
   proc do |f|
-    array_u(@upper[f.pos], ...).call(f)
+    upper = @upper[f.pos]
+    arr = []
+    while f.pos < upper
+      arr << inner.call(f, arr)
+    end
+    arr.pop if f.pos > upper
+    arr
   end
 end
 
