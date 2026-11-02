@@ -92,6 +92,13 @@ def array(inner)
   end
 end
 
+def bytes
+  proc do |f|
+    length = @upper[f.pos] - f.pos
+    f.read(length)
+  end
+end
+
 def layout(filename = nil, &block)
   @layout = block
   return unless filename
