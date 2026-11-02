@@ -78,6 +78,16 @@ def bit(bitfield, bits, type = :u)
   end
 end
 
+def bitfields(bitfield, **info)
+  pos = 0
+  info.reverse_each.to_h.transform_values do |spec|
+    type, size = spec.is_a?(Hash) ? spec.first : [:u, spec]
+    start = pos
+    pos += size
+    bit(bitfield, start...pos, type)
+  end.reverse_each.to_h
+end
+
 def implementation(f)
   f.seek(0xccdb8)
   menu_definitions = array_u(
@@ -91,10 +101,7 @@ def implementation(f)
   quest_descriptor_table = array_u(
     0xd63e4, struct(
       6, 'nN', %i[bf1 filter],
-      initial_state: bit(:bf1, 15, :b),
-      type: bit(:bf1, 11..14),
-      item_list: bit(:bf1, 6..10),
-      item_index: bit(:bf1, 0..5)
+      **bitfields(:bf1, initial_state: {b:1}, type: 4, item_list: 5, item_index: 6)
     )
   ).call(f, nil)
 
