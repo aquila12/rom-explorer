@@ -35,7 +35,8 @@ def reference_implementation(f)
   { lut_nibbleswap: f.pread(256, 0x434c0).unpack('C256'), menu_definitions:, quest_descriptor_table: }
 end
 
-def struct(size, format, names, *bitfields, **postprocessing)
+def struct(format, names, *bitfields, **postprocessing)
+  size = sizeof(format)
   after = [*bitfields, postprocessing].inject(:merge)
   proc do |f, parent|
     values = f.read(size).unpack(format)
@@ -45,11 +46,13 @@ def struct(size, format, names, *bitfields, **postprocessing)
   end
 end
 
-def array_raw(size, format)
+def array_raw(format)
+  size = sizeof(format)
   proc { |f| f.read(size).unpack(format) }
 end
 
-def value_raw(size, format)
+def value_raw(format)
+  size = sizeof(format)
   proc { |f| f.read(size).unpack1(format) }
 end
 
@@ -120,20 +123,25 @@ end
 def layout
   at 0xccdb8, menu_definitions: array(
     struct(
-      12, 'Z6C6', %i[text _f1 _f2 _f3 _f4 type n_entries],
-      entries: array_n(:n_entries, struct(14, 'Z6C8', %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type]))
+      'Z6C6', %i[text _f1 _f2 _f3 _f4 type n_entries],
+      entries: array_n(:n_entries, struct('Z6C8', %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type]))
     ))
   at 0xcd430
 
   at 0xd601e, quest_descriptor_table: array(
     struct(
-      6, 'nN', %i[bf1 filter],
+      'nN', %i[bf1 filter],
       bitfields(:bf1, 16, initial_state: :b, type: 4, item_list: 5, item_index: 6)
     )
   )
   at 0xd63e4
 
-  at 0x434c0, lut_nibbleswap: array_raw(256, 'C256')
+  at 0x434c0, lut_nibbleswap: array_raw('C256')
+end
+
+ZEROBLOCK = "\0" * 1024
+def sizeof(format)
+  ZEROBLOCK.unpack(format).pack(format).bytesize
 end
 
 def implementation(f)
