@@ -3,10 +3,8 @@ require 'yaml'
 def hex(n) = "0x%05x" % n
 
 def reference_implementation(f)
-  f.seek(0xccdb8)
-
   menu_definitions = []
-
+  f.seek(0xccdb8)
   while(f.pos < 0xcd430)
     mvalues = f.read(12).unpack 'Z6C6'
     struct = %i[text _f1 _f2 _f3 _f4 type n_entries].zip(mvalues).to_h
@@ -19,7 +17,22 @@ def reference_implementation(f)
     )
   end
 
-  { menu_definitions: }
+  quest_descriptor_table = []
+  f.seek(0xd601e)
+  while(f.pos < 0xd63e4)
+    qvalues = f.read(6).unpack 'nN'
+    struct = %i[bf1 filter].zip(qvalues).to_h
+
+    b = struct[:bf1]
+    quest_descriptor_table << struct.merge(
+      initial_state: !b[15].zero?,
+      type: b[11..14],
+      item_list: b[6..10],
+      item_index: b[0..5]
+    )
+  end
+
+  { menu_definitions:, quest_descriptor_table: }
 end
 
 def struct(size, format, names, **after)
@@ -52,6 +65,19 @@ def array_u(upper, inner)
   end
 end
 
+def bit(bitfield, bits, type = :u)
+  proc do |f, parent|
+    v = parent[bitfield][bits]
+    case type
+    when :u then v
+    when :b then !v.zero?
+    when :i then
+      b = bits.is_a?(Range) ? bits.size : 1
+      v[b - 1].zero? ? v : v - (1 << b)
+    end
+  end
+end
+
 def implementation(f)
   f.seek(0xccdb8)
   menu_definitions = array_u(
@@ -61,7 +87,18 @@ def implementation(f)
     )
   ).call(f, nil)
 
-  { menu_definitions: }
+  f.seek(0xd601e)
+  quest_descriptor_table = array_u(
+    0xd63e4, struct(
+      6, 'nN', %i[bf1 filter],
+      initial_state: bit(:bf1, 15, :b),
+      type: bit(:bf1, 11..14),
+      item_list: bit(:bf1, 6..10),
+      item_index: bit(:bf1, 0..5)
+    )
+  ).call(f, nil)
+
+  { menu_definitions:, quest_descriptor_table: }
 end
 
 # Strict testing of hash equality: order matters
