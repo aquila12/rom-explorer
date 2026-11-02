@@ -5,13 +5,13 @@ def hex(n) = "0x%05x" % n
 def reference_implementation(f)
   f.seek(0xccdb8)
 
-  arr = []
+  menu_definitions = []
 
   while(f.pos < 0xcd430)
     mvalues = f.read(12).unpack 'Z6C6'
     struct = %i[text _f1 _f2 _f3 _f4 type n_entries].zip(mvalues).to_h
 
-    arr << struct.merge(entries:
+    menu_definitions << struct.merge(entries:
       Array.new(struct[:n_entries]) do |n|
         evalues = f.read(14).unpack 'Z6C8'
         %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type].zip(evalues).to_h
@@ -19,7 +19,7 @@ def reference_implementation(f)
     )
   end
 
-  arr
+  { menu_definitions: }
 end
 
 def struct(size, format, names, **after)
@@ -54,12 +54,14 @@ end
 
 def implementation(f)
   f.seek(0xccdb8)
-  array_u(
+  menu_definitions = array_u(
     0xcd430, struct(
       12, 'Z6C6', %i[text _f1 _f2 _f3 _f4 type n_entries],
       entries: array_n(:n_entries, struct(14, 'Z6C8', %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type]))
     )
   ).call(f, nil)
+
+  { menu_definitions: }
 end
 
 # Strict testing of hash equality: order matters
