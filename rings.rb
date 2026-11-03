@@ -69,7 +69,7 @@ layout 'rings.bin' do
 
   at 0xb86ae, portrait_directory: directory
   at 0xb8a32, portrait_files: bytes #, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels, # Pixels are 8x8 cells in reading order
-  at 0xcc9d8, palettes: array(array_raw('n16')) # 16-colour 16-bit packed 0bgr x 16 entries
+  at 0xcc9d8, palettes: array(array_n(16, struct('n', %i[raw], bitfields(:raw, r:4, g:4, b:4)))) # 16-colour 16-bit packed 0bgr x 16 entries
 
   # Static menus
   at 0xccdb8, menu_definitions: array(
