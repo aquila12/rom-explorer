@@ -79,7 +79,7 @@ layout 'rings.bin' do
     )
   )
 
-  at 0xcd430, menu_words: array(struct('CZ*', %i[flags name])) # Also includes character names
+  at 0xcd430, menu_words: array(struct('CZ15', %i[flags name])) # Also includes character names
   at 0xcecf0, :data
 
   # FIXME: should be able to have an array field here.  This is what we get for using unpack.
