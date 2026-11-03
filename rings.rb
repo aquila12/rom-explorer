@@ -33,14 +33,14 @@ layout 'rings.bin' do
   at 0x1a990, text_status_mood: array(value_raw('Z16'))
   at 0x1aa60, text_status_level: array(array_n(9, value_raw('Z10'))) # Untrained has no level vector
   at 0x1ade4, :data
-  at 0x1ae98, ingame_map_lookup: array(struct('CC', [:mirror, :normal ])) # Indexes textures somehow
-  at 0x1b298, city_goods: array(struct('CC', [:export, :import ])) # Half or double price
-  at 0x1b2e0, gate_locations: array(struct('nn', [:lon, :lat ])) # Centres of the gates
-  at 0x1b300, gate_deltas: array(struct('s>s>', [:dlon, :dlat ])) # Relative position of 8 squares around a centre
+  at 0x1ae98, ingame_map_lookup: array(struct('CC', %i[mirror normal])) # Indexes textures somehow
+  at 0x1b298, city_goods: array(struct('CC', %i[export import])) # Half or double price
+  at 0x1b2e0, gate_locations: array(struct('nn', %i[lon lat])) # Centres of the gates
+  at 0x1b300, gate_deltas: array(struct('s>s>', %i[dlon dlat])) # Relative position of 8 squares around a centre
   at 0x1b320, text_title_scroller: array(value_raw('Z42'))
   at 0x1b446, :data
   at 0x1b4d2, parallax_table: array(struct('c*', [:x_offset]))
-  at 0x1b4ee, gomez_maze_table: array(struct('cccc', [:mound_lon, :mound_lat, :stump_lon, :stump_lat]))
+  at 0x1b4ee, gomez_maze_table: array(struct('cccc', %i[mound_lon mound_lat stump_lon stump_lat]))
   at 0x1b50e, :data
 
   at 0x1b5d6, *code
@@ -76,9 +76,10 @@ layout 'rings.bin' do
     struct(
       'Z6C6', %i[text _f1 _f2 _f3 _f4 type n_entries],
       entries: array_n(:n_entries, struct('Z6C8', %i[text _f1 _f2 _f3 _f4 _f5 submenu_id value type]))
-    ))
+    )
+  )
 
-  at 0xcd430, menu_words: array(struct('CZ*', [:flags, :name ])) # Also includes character names
+  at 0xcd430, menu_words: array(struct('CZ*', %i[flags name])) # Also includes character names
   at 0xcecf0, :data
 
   # FIXME: should be able to have an array field here.  This is what we get for using unpack.
@@ -88,12 +89,12 @@ layout 'rings.bin' do
   at 0xd2ec2, :table, array(bytes(12))
   at 0xd301e, sign_positions: array(struct('nnn', %w[lon lat unused]))
   at 0xd3102, :table, array(bytes(12))
-  at 0xd601e, lockables_table: array(struct('nncc', [:flags1, :flags2, :local_lon, :local_lat ])) # Matches quest flag index
-  at 0xd63e4, locations_something: array(bytes(4))  # Indexed by location ID
-  at 0xd66a0, item_lists: array(struct('ccccnnn', [:unk1, :unk2, :unk3, :count, :unk4, :menu_word, :table_offset ])) # Indexes item_values
-  at 0xd6768, item_values: array(struct('nn', [:menu_word, :value ])) # Game logic LUTs e.g. pricepoints, paper paragraph index
-  at 0xd6b6c, spells: array(struct('Nn', [:packed_data, :mana_cost ])) # xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow
-  at 0xd6e60, class_levels: array(array_n(10, struct('C', [:spell_limit ]))) # Can cast anything less than limit
+  at 0xd601e, lockables_table: array(struct('nncc', %i[flags1 flags2 local_lon local_lat])) # Matches quest flag index
+  at 0xd63e4, locations_something: array(bytes(4)) # Indexed by location ID
+  at 0xd66a0, item_lists: array(struct('ccccnnn', %i[unk1 unk2 unk3 count unk4 menu_word table_offset])) # Indexes item_values
+  at 0xd6768, item_values: array(struct('nn', %i[menu_word value])) # Game logic LUTs e.g. pricepoints, paper paragraph index
+  at 0xd6b6c, spells: array(struct('Nn', %i[packed_data mana_cost])) # xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow
+  at 0xd6e60, class_levels: array(array_n(10, struct('C', [:spell_limit]))) # Can cast anything less than limit
 
   at 0xd6eba, dictionary: bytes
   at 0xdc0c0, :data
