@@ -71,11 +71,22 @@ end
 
 def at(addr, anon = nil, spec = nil, **what)
   if anon
+    raise ArgumentError, 'at: multiple names specified' unless what.empty?
+
     name = "#{anon.to_s}_%05x" % addr
-    what = { name: spec || bytes }
+    reader = spec || bytes
+  elsif what.empty?
+    @regions[addr] = nil
+    return
+  else
+    raise ArgumentError, 'at: multiple names specified' if what.length > 1
+
+    name, reader = what.first
   end
 
-  @regions[addr] = what
+  info = { name:, addr:, reader: }
+  @regions[addr] = info
+  @what[name] = info
 end
 
 def array(inner)
@@ -121,13 +132,17 @@ end
 
 def unmake(f)
   @regions = {}
+  @what = {}
   @layout.call(f)
   starts = @regions.keys.sort
   @upper = (starts + [f.size]).each_cons(2).to_h
 
-  starts.map do |start|
-    f.seek(start)
-    @regions[start].transform_values { |p| p.call(f) }
-  end.inject(:merge)
-end
+  @outputs = Hash.new do |outputs, name|
+    info = @what.fetch(name)
+    f.seek(info[:addr])
+    outputs[name] = info[:reader].call(f)
+  end
 
+  @what.keys.each { |k| @outputs[k] }
+  @outputs
+end
