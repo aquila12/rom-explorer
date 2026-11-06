@@ -103,9 +103,14 @@ def array(inner)
   end
 end
 
-def bytes(length = nil)
+def bytes(*params)
+  length = params.shift if params.first.is_a? Integer
+  postprocess = params
+
   proc do |f|
-    f.read(length || (@upper[f.pos] - f.pos))
+    d = f.read(length || (@upper[f.pos] - f.pos))
+    postprocess.each { |p| d = p.call(d) }
+    d
   end
 end
 

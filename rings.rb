@@ -96,12 +96,23 @@ layout 'rings.bin' do
   at 0xd6b6c, spells: array(struct('Nn', %i[packed_data mana_cost])) # xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow
   at 0xd6e60, class_levels: array(array_n(10, struct('C', [:spell_limit]))) # Can cast anything less than limit
 
-  at 0xd6eba, dictionary: bytes
+  at 0xd6eba, dictionary: bytes(
+    proc do |data|
+      index = @outputs[:dictionary_index]
+      index.unshift(0)  # Bit of a hack; the game actually flubs this
+      index.each_cons(2).map { |a, b| data[a...b] }
+    end
+  )
+
   at 0xdc0c0, :data
   at 0xdc0c2, dictionary_index: array(value_raw('n'))
 
   at 0xddbd8, paragraph_directory: directory
-  at 0xe0a18, paragraph_wordlists: array(struct('n', %i[bf], bitfields(:bf, 16, punc: 2, word_id: 14)))
+  at 0xe0a18, paragraph_wordlists: array(
+    struct('n', %i[bf], bitfields(:bf, 16, punc: 2, word_id: 14), word: proc do |f, struct|
+      @outputs[:dictionary][struct[:word_id]]
+    end)
+  )
 
   at 0xeb770, :data
   at 0xed0e8, :data
