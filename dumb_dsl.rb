@@ -143,6 +143,5 @@ def unmake(f)
     outputs[name] = info[:reader].call(f)
   end
 
-  @what.keys.each { |k| @outputs[k] }
-  @outputs
+  @what.keys.to_h { |k| [k, @outputs[k]] }
 end
