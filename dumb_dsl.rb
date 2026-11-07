@@ -114,6 +114,15 @@ def bytes(*params)
   end
 end
 
+def indexed_offset(&offsets)
+  proc do |data|
+    addrs = offsets.call
+    raise ArgumentError, 'Indexed offset is not integer' unless addrs.all? { |e| e.is_a? Integer }
+
+    addrs.each_cons(2).map { |a, b| data[a...b] }
+  end
+end
+
 def layout(filename = nil, &block)
   @layout = block
   return unless filename
