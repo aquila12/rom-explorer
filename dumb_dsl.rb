@@ -118,7 +118,7 @@ def indexed(inner = proc { |f, l| f.read(l) }, &offsets)
   proc do |f|
     base = f.pos
     upper = @upper[f.pos]
-    addrs = offsets.call
+    addrs = offsets.call + [upper]
     raise ArgumentError, 'Indexed offset is not integer' unless addrs.all? { |e| e.is_a? Integer }
 
     arr = []
