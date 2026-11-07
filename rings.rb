@@ -56,16 +56,13 @@ layout 'rings.bin' do
   at 0x435c0, lut_hblit_offset: array(value_raw('n')) # 36-cell wide area for isometric view
   at 0x436e0, lut_vblit_offset: array(value_raw('n')) # 24-cell high area for isometric view
   at 0x43850, map_directory: directory
-  at 0x44228 #, map_files: Bytes, LZSSData, 'n*' # World (77), generic (32), room (121), big room (22)
+  at 0x44228, map_files: indexed(lzss) { @outputs[:map_directory].map { |e| e[:offset] } } # World (77), generic (32), room (121), big room (22)
   at 0x5edc4, :data
   at 0x5f524, isotile_index: array(value_raw('N')) # Indexes data at 0x603e4
-  at 0x603e4, isotile_data: bytes #, Struct, 'a*' # Image scanlines with flags - 00 = end - len/off; *pixels
+  at 0x603e4, isotile_data: indexed { @outputs[:isotile_index] } # Image scanlines with flags - 00 = end - len/off; *pixels
 
   at 0x96120, lzss_directory: directory
-  # at 0x9638c, lzss_files: Bytes, LZSSData, 'a*'
-  # at 0xb3d40, scrolltext_epilogue: LZSSData, 'a*' # Images are signalled by 0x80 + portraid id
-  # at 0xb6221, scrolltext_credits: LZSSData, 'a*' # Images are signalled by 0x80 + portraid id
-  # at 0xb83a1, scrolltext_citizens: LZSSData, 'a*' # Images are signalled by 0x80 + portraid id
+  at 0x9638c, lzss_files: indexed(lzss) { @outputs[:lzss_directory].map { |e| e[:offset] } }
 
   at 0xb86ae, portrait_directory: directory
   at 0xb8a32, portrait_files: indexed(lzss) { @outputs[:portrait_directory].map { |e| e[:offset] } } # Struct, 'n16a*', *(0..15).to_a, :pixels, # Pixels are 8x8 cells in reading order
