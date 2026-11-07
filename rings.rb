@@ -68,9 +68,8 @@ layout 'rings.bin' do
   # at 0xb83a1, scrolltext_citizens: LZSSData, 'a*' # Images are signalled by 0x80 + portraid id
 
   at 0xb86ae, portrait_directory: directory
-  at 0xb8a32, portrait_files: bytes( #, LZSSData, Struct, 'n16a*', *(0..15).to_a, :pixels, # Pixels are 8x8 cells in reading order
-    indexed_offset { @outputs[:portrait_directory].map { |e| e[:offset] } }
-  )
+  at 0xb8a32, portrait_files: indexed(lzss) { @outputs[:portrait_directory].map { |e| e[:offset] } } # Struct, 'n16a*', *(0..15).to_a, :pixels, # Pixels are 8x8 cells in reading order
+
   at 0xcc9d8, palettes: array(array_n(16, struct('n', %i[raw], bitfields(:raw, r:4, g:4, b:4)))) # 16-colour 16-bit packed 0bgr x 16 entries
 
   # Static menus
@@ -98,7 +97,7 @@ layout 'rings.bin' do
   at 0xd6b6c, spells: array(struct('Nn', %i[packed_data mana_cost])) # xxxxxRRR xDDDDDD1 x0x0xSSS SSxxxxxx S=11111 for mame spells???  Damage can be > 63 somehow
   at 0xd6e60, class_levels: array(array_n(10, struct('C', [:spell_limit]))) # Can cast anything less than limit
 
-  at 0xd6eba, dictionary: bytes(indexed_offset { @outputs[:dictionary_index] })
+  at 0xd6eba, dictionary: indexed { @outputs[:dictionary_index] }
 
   at 0xdc0c0, :data
   at 0xdc0c2, dictionary_index: array(value_raw('n'))

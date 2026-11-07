@@ -114,12 +114,28 @@ def bytes(*params)
   end
 end
 
-def indexed_offset(&offsets)
-  proc do |data|
+def indexed(inner = proc { |f, l| f.read(l) }, &offsets)
+  proc do |f|
+    base = f.pos
+    upper = @upper[f.pos]
     addrs = offsets.call
     raise ArgumentError, 'Indexed offset is not integer' unless addrs.all? { |e| e.is_a? Integer }
 
-    addrs.each_cons(2).map { |a, b| data[a...b] }
+    arr = []
+    addrs.each_cons(2) do |a, b|
+      f.seek(base + a)
+      arr << inner.call(f, b - a)
+      arr.pop if f.pos > upper
+    end
+    arr
+  end
+end
+
+require_relative 'lib/lzss_decompressor'
+require 'stringio'
+def lzss(inner = proc { |f| f.read })
+  proc do |f|
+    StringIO.open(LZSSDecompressor.decompress(f), &inner)
   end
 end
 
