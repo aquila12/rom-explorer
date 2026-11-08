@@ -165,6 +165,10 @@ def layout(filename = nil, &block)
     YAML.safe_dump(data, stringify_names: true)
   end
 
+  @timing.each do |name, time|
+    puts "#{name}:\t#{(time * 1000).round(2)} ms"
+  end
+
   if File.exist? outfile
     content = File.read(outfile)
     if content == yaml
@@ -174,10 +178,6 @@ def layout(filename = nil, &block)
   end
 
   File.write(outfile, yaml)
-
-  @timing.each do |name, time|
-    puts "#{name}:\t#{(time * 1000).round(2)} ms"
-  end
 end
 
 def unmake(f)
