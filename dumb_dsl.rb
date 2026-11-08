@@ -139,6 +139,19 @@ def lzss(inner = proc { |f| f.read })
   end
 end
 
+@timing = {}
+def profile(name, count = 1)
+  t0 = Time.now
+  n = 0
+  while(n < count)
+    r = yield
+    n += 1
+  end
+  t1 = Time.now
+  @timing[name] = (t1 - t0) / count
+  r
+end
+
 def layout(filename = nil, &block)
   @layout = block
   return unless filename
@@ -147,7 +160,10 @@ def layout(filename = nil, &block)
   outfile = "#{basename}.yaml"
 
   data = File.open(filename, 'rb') { |f| unmake(f) }
-  yaml = YAML.safe_dump(data, stringify_names: true)
+
+  yaml = profile(:yaml) do
+    YAML.safe_dump(data, stringify_names: true)
+  end
 
   if File.exist? outfile
     content = File.read(outfile)
@@ -158,20 +174,30 @@ def layout(filename = nil, &block)
   end
 
   File.write(outfile, yaml)
+
+  @timing.each do |name, time|
+    puts "#{name}:\t#{(time * 1000).round(2)} ms"
+  end
 end
 
 def unmake(f)
-  @regions = {}
-  @what = {}
-  @layout.call(f)
-  starts = @regions.keys.sort
-  @upper = (starts + [f.size]).each_cons(2).to_h
+  profile(:unmake) do
+    @regions = {}
+    @what = {}
+    profile(:layout) do
+      @layout.call(f)
+    end
+    starts = @regions.keys.sort
+    @upper = (starts + [f.size]).each_cons(2).to_h
 
-  @outputs = Hash.new do |outputs, name|
-    info = @what.fetch(name)
-    f.seek(info[:addr])
-    outputs[name] = info[:reader].call(f)
+    @outputs = Hash.new do |outputs, name|
+      info = @what.fetch(name)
+      f.seek(info[:addr])
+      outputs[name] = info[:reader].call(f)
+    end
+
+    profile(:read) do
+      @what.keys.to_h { |k| [k, @outputs[k]] }
+    end
   end
-
-  @what.keys.to_h { |k| [k, @outputs[k]] }
 end
