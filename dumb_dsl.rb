@@ -133,6 +133,7 @@ end
 
 require_relative 'lib/lzss_decompressor'
 require 'stringio'
+# FIXME: this is really, really slow - maybe should be done out-of-process?
 def lzss(inner = proc { |f| f.read })
   proc do |f|
     StringIO.open(LZSSDecompressor.decompress(f), &inner)
