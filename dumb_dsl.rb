@@ -191,9 +191,11 @@ def unmake(f)
     @upper = (starts + [f.size]).each_cons(2).to_h
 
     @outputs = Hash.new do |outputs, name|
-      info = @what.fetch(name)
-      f.seek(info[:addr])
-      outputs[name] = info[:reader].call(f)
+      profile("read[#{name}]") do
+        info = @what.fetch(name)
+        f.seek(info[:addr])
+        outputs[name] = info[:reader].call(f)
+      end
     end
 
     profile(:read) do
