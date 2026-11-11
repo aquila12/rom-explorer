@@ -49,3 +49,7 @@ montage $OPTIONS \
   label:{0x1d0,+{1..9},+{a..f}} tiles/tile-{464..511}.bmp \
   label:{0x230,+{1..9},+{a..f}} tiles/tile-{560..589}.bmp \
   tiles-terrain.png
+
+[ -f tiles-atlas.png ] ||
+montage -border 0 -tile 32x -geometry +0+0 -extent 32x32 -gravity northwest \
+  -fill transparent -transparent '#ff00ff' tiles/tile-{0..943}.bmp tiles-atlas.png
