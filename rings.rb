@@ -57,7 +57,7 @@ layout 'rings.bin' do
   at 0x436e0, lut_vblit_offset: array(value_raw('n')) # 24-cell high area for isometric view
   at 0x43850, map_directory: directory
   at 0x44228, map_files: indexed(lzss) { @outputs[:map_directory].map { |e| e[:offset] } } # World (77), generic (32), room (121), big room (22)
-  at 0x5edc4, terrain_data: array(struct('N', [:bf], bitfields(:bf, 16, behaviour: 6, animate_next: 1, half_higher: 1, one_higher: 1, animate_prev: 1, same_basement: 1, base_depth_or_alt_base: 5)))
+  at 0x5edc4, terrain_data: array(struct('n', [:bf], bitfields(:bf, 16, behaviour: 6, animate_next: 1, half_higher: 1, one_higher: 1, animate_prev: 1, same_basement: 1, base_depth_or_alt_base: 5)))
   at 0x5f524, isotile_index: array(value_raw('N')) # Indexes data at 0x603e4
   at 0x603e4, isotile_data: indexed { @outputs[:isotile_index] } # Image scanlines with flags - 00 = end - len/off; *pixels
 
